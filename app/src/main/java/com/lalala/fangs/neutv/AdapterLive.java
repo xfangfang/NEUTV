@@ -3,7 +3,6 @@ package com.lalala.fangs.neutv;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,11 +76,24 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
         }
     }
 
-    public void update(int position){
+    void update(int position){
         if(position < mLiveList.size() && position>=0){
             notifyItemChanged(position);
         }
     }
+
+    void updateAll(List<Live> liveList){
+        mLiveList = liveList;
+        notifyDataSetChanged();
+    }
+
+    void remove(int position){
+        if(position < mLiveList.size() && position>=0){
+            mLiveList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
 
 
     AdapterLive(List<Live> liveList) {
@@ -102,7 +114,7 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Live live = mLiveList.get(position);
         holder.liveName.setText(live.getName());
-        Log.e(TAG, "onBindViewHolder: "+live.getName() );
+//        Log.e(TAG, "onBindViewHolder: "+live.getName() );
         if(live.getIsFavorite()){
             holder.favoriteImg.setBackgroundColor(Color.parseColor("#FF0000"));
         }else{

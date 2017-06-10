@@ -1,11 +1,15 @@
 package com.lalala.fangs.neutv;
 
+import org.litepal.crud.DataSupport;
+
+import java.io.Serializable;
+
 /**
  * Created by FANGs on 2017/3/2.
  */
 
-public class Live {
-//    "num":50001,
+public class Live extends DataSupport implements Serializable {
+//            "num":50001,
 //            "itemid":"uid0",
 //            "name":"CCTV-1高清",
 //            "epgid":"cntv-zhejiang",

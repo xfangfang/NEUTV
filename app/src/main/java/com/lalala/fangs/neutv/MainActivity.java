@@ -1,11 +1,16 @@
 package com.lalala.fangs.neutv;
 
+import android.content.BroadcastReceiver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lalala.fang.neutvshow.R;
@@ -25,9 +31,11 @@ import com.lalala.fang.neutvshow.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.xfangfang.flyme6.TabStrip;
 import okhttp3.OkHttpClient;
@@ -38,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private TabStrip tabStrip;
-//    private BlurringView mBlurringView;
-//    private ImageView test;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,15 +55,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-//        toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.also_good_192_384_bond));
-//        toolbar.setOnMenuItemClickListener(onMenuItemClick);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         ArrayList<Fragment> datas = new ArrayList<>();
-        datas.add(new FindBooksFragment());
-        datas.add(new FindBooksFragment());
-        datas.add(new FindBooksFragment());
+        datas.add(new AllLiveFragment());
+        datas.add(new FavoriteLiveFragment());
+//        datas.add(new FindBooksFragment());
 
         mSectionsPagerAdapter.setData(datas);
 
@@ -68,18 +73,14 @@ public class MainActivity extends AppCompatActivity {
         tabStrip = (TabStrip) findViewById(R.id.tabstrip);
         tabStrip.setViewPager(mViewPager);
 
-//        mBlurringView = (BlurringView) findViewById(R.id.blurring_view);
 
-        // Give the blurring view a reference to the blurred view.
-//        test = (ImageView) findViewById(R.id.test);
-//        mBlurringView.setBlurredView(test);
     }
 
 
 
-    public static class FindBooksFragment extends Fragment {
+    public static class AllLiveFragment extends Fragment {
 
-        public FindBooksFragment() {
+        public AllLiveFragment() {
         }
 
         private RecyclerView recyclerView;
@@ -113,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().url(updateUrl).build();
                 okhttp3.Response response;
+                //每次取节目单前先清除磁盘缓存
+                Glide.get(getContext()).clearDiskCache();
                 try {
                     response = client.newCall(request).execute();
                     String res = response.body().string();
@@ -124,6 +127,19 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                     return false;
                 }
+                for(Live i:
+                        liveList){
+                    Live temp = DataSupport.where("num = ?",String.valueOf(i.getNum())).findFirst(Live.class);
+                    if(temp == null){
+                        i.save();
+                    }else{
+                        i.setIsFavorite(temp.getIsFavorite());
+                        if(temp.getIsFavorite()){
+                            Log.e(TAG, "doInBackground: "+temp.getName() );
+                        }
+                    }
+                }
+
                 return true;
             }
 
@@ -156,21 +172,113 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        private static final String TAG = "FindBooksFragment";
         private void addToFavorite(int position){
-
-            if(liveList.get(position).getIsFavorite()){
-                liveList.get(position).setIsFavorite(false);
+            Live t = liveList.get(position);
+            ContentValues values = new ContentValues();
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+            Intent bookShelfintent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
+            if(t.getIsFavorite()){
+                t.setIsFavorite(false);
+                values.put("isFavorite", "0");
                 Toast.makeText(getContext(),"从收藏中已删除～",Toast.LENGTH_LONG).show();
-                adapter.update(position);
             }else {
-                liveList.get(position).setIsFavorite(true);
+                t.setIsFavorite(true);
+                values.put("isFavorite", "1");
                 Toast.makeText(getContext(),"加入到我的收藏～",Toast.LENGTH_LONG).show();
-                adapter.update(position);
             }
+            //更新数据库
+            DataSupport.updateAll(Live.class, values, "num = ?", String.valueOf(t.getNum()));
+            localBroadcastManager.sendBroadcast(bookShelfintent);
+            adapter.update(position);
         }
 
 
     }
+
+    public static class FavoriteLiveFragment extends Fragment {
+
+        public FavoriteLiveFragment() {
+        }
+
+        private RecyclerView recyclerView;
+        private ProgressBar progressBar;
+        private List<Live> liveList=new ArrayList<>();
+        private AdapterLive adapter;
+        private LocalBroadcastManager loaclBroadcastManager;
+        private FavoriteReceiver receiver;
+        private IntentFilter intentFilter;
+
+
+        @Override
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+
+            View rootView = inflater.inflate(R.layout.fragment_all, container, false);
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+            progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
+            liveList = DataSupport.where("isFavorite = ?","1").find(Live.class);
+            adapter = new AdapterLive(liveList);
+            StaggeredGridLayoutManager sm = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+            recyclerView.setLayoutManager(sm);
+            recyclerView.setAdapter(adapter);
+            adapter.setOnItemClickListener(new AdapterLive.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    Intent intent = new Intent(getContext(), Video.class);
+                    intent.putExtra("Name",liveList.get(position).getUrllist());
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onItemLongClick(View view, int position) {
+                    addToFavorite(position);
+                }
+            });
+            loaclBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+            intentFilter = new IntentFilter();
+            intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
+            receiver = new FavoriteReceiver();
+            loaclBroadcastManager.registerReceiver(receiver, intentFilter);
+            return rootView;
+        }
+
+
+        private static final String TAG = "FindBooksFragment";
+        private void addToFavorite(int position){
+            Live t = liveList.get(position);
+            ContentValues values = new ContentValues();
+            if(t.getIsFavorite()){
+                t.setIsFavorite(false);
+                values.put("isFavorite", "0");
+                Toast.makeText(getContext(),"从收藏中已删除～",Toast.LENGTH_LONG).show();
+                adapter.remove(position);
+            }else {
+                t.setIsFavorite(true);
+                values.put("isFavorite", "1");
+                Toast.makeText(getContext(),"加入到我的收藏～",Toast.LENGTH_LONG).show();
+                adapter.update(position);
+            }
+            //更新数据库
+            DataSupport.updateAll(Live.class, values, "num = ?", String.valueOf(t.getNum()));
+        }
+
+        class FavoriteReceiver extends BroadcastReceiver {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.e(TAG, "onReceive: 收到信息" );
+                liveList = DataSupport.where("isFavorite = ?","1").find(Live.class);
+                for(Live i:
+                        liveList){
+                    Log.e(TAG, "onReceive: "+i.getName() );
+                }
+                adapter.updateAll(liveList);
+            }
+        }
+
+    }
+
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -197,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            String[] titles = new String[] { "全部", "频道", "收藏"};
+            String[] titles = new String[] { "全部", "收藏", "收藏"};
             return titles[position];
         }
 
