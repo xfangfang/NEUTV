@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#000000"
+    android:layout_height="match_parent"
+    tools:context="com.lalala.fangs.neutv.Video">
+
+
+<RelativeLayout
+    android:id="@+id/video_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+</RelativeLayout>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerInParent="true" />
+    <TextView
+        android:id="@+id/textChange"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="32sp"
+        android:background="#000000"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="+00:00"/>
+
+
+    <RelativeLayout
+        android:id="@+id/controlerTop"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#90f0f0f0">
+        <ImageView
+            android:id="@+id/topImg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_launcher"/>
+        <TextView
+            android:id="@+id/textTvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:layout_centerVertical="true"
+            android:text="正在直播"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00ffffff"
+            android:text="close"
+            android:layout_alignParentRight="true"
+            android:onClick="closeWin"
+            android:id="@+id/buttonClose"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/controlerBottom"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:layout_gravity="bottom"
+            android:background="#90f0f0f0"
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暂停"
+                android:background="#00ffffff"
+                android:onClick="pause"
+                android:id="@+id/buttonPause"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity=""
+                android:text="   00:00"
+                android:id="@+id/textNow" />
+            <SeekBar
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/seekBar"
+                android:indeterminate="false" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="   00:00"
+                android:id="@+id/textAll" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00ffffff"
+                android:text="节目"
+                android:onClick="showTv"
+                android:id="@+id/buttonTvShow"/>
+        </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/LineTvShow"
+        android:padding="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s1"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s2"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s3"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s4"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s5"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s6"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s7"
+                android:text="◉" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="s8"
+                android:text="◉" />
+        </LinearLayout>
+
+        <ListView
+            android:background="#90f0f0f0"
+            android:id="@+id/listView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</RelativeLayout>
