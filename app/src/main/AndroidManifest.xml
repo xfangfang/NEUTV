@@ -17,7 +17,8 @@
         android:name="org.litepal.LitePalApplication" >
         <activity
             android:name="com.lalala.fangs.neutv.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

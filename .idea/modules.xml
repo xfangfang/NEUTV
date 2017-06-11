@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NeuTV.iml" filepath="$PROJECT_DIR$/NeuTV.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/blurringview/blurringview.iml" filepath="$PROJECT_DIR$/blurringview/blurringview.iml" />
       <module fileurl="file://$PROJECT_DIR$/tabstrip/tabstrip.iml" filepath="$PROJECT_DIR$/tabstrip/tabstrip.iml" />
     </modules>
   </component>

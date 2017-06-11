@@ -3,6 +3,7 @@ package com.lalala.fangs.neutv;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.lalala.fang.neutvshow.R;
 
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -29,7 +29,6 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
     private List<Live> mLiveList;
     private OnItemClickListener listener;
     private Context context;
-    private HashMap<String,String> map;
 
 
     public interface OnItemClickListener {
@@ -76,7 +75,20 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
         }
     }
 
+//    void update(int position,Live live){
+//                Log.e(TAG, "update: position " +String.valueOf(position)
+//                +" favorite "+String.valueOf(mLiveList.get(position).getIsFavorite()) );
+//        if(position < mLiveList.size() && position>=0){
+//            mLiveList.set(position,live);
+//            notifyItemChanged(position);
+//        }
+//        Log.e(TAG, "update: position " +String.valueOf(position)
+//                +" favorite "+String.valueOf(mLiveList.get(position).getIsFavorite()) );
+//    }
+
     void update(int position){
+        Log.e(TAG, "update: position " +String.valueOf(position)
+                +" favorite "+String.valueOf(mLiveList.get(position).getIsFavorite()) );
         if(position < mLiveList.size() && position>=0){
             notifyItemChanged(position);
         }

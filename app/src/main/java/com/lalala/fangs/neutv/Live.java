@@ -80,5 +80,17 @@ public class Live extends DataSupport implements Serializable {
         this.urllist = urllist;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Live) {
+            if (this.getNum() == ((Live) obj).getNum()) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
 
 }

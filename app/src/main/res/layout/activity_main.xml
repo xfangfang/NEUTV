@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
     android:background="#FFFFFF"
+    android:fitsSystemWindows="true"
     tools:context="com.lalala.fangs.neutv.MainActivity">
 
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:elevation="0dp">
+            app:elevation="0dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -42,38 +40,46 @@
                     android:src="@mipmap/zhi" />
 
             </android.support.v7.widget.Toolbar>
+
             <View
-                android:layout_height="1dp"
                 android:layout_width="match_parent"
-                android:background="#E5E5E5"/>
+                android:layout_height="1dp"
+                android:background="#E5E5E5" />
+
             <cn.xfangfang.flyme6.TabStrip
                 android:id="@+id/tabstrip"
-                android:layout_gravity="center_horizontal"
-                custom:indicatorHeight="4dp"
-                custom:indicatorColor="#00BDA5"
-                custom:indicatorMargin="15dp"
-                custom:indicatorTextSize="14sp"
-                custom:selectedIndicatorTextSize="14sp"
-                custom:indicatorTextColor="#686868"
-                custom:indicatorTextBold="true"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"/>
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                custom:indicatorColor="#00BDA5"
+                custom:indicatorHeight="4dp"
+                custom:indicatorMargin="15dp"
+                custom:indicatorTextBold="true"
+                custom:indicatorTextColor="#686868"
+                custom:indicatorTextSize="14sp"
+                custom:selectedIndicatorTextSize="14sp" />
+
             <View
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="4dp"
-                android:layout_width="match_parent"
-                android:background="#E5E5E5"/>
+                android:background="#E5E5E5" />
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/container"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+            <android.support.v4.view.ViewPager
+                android:id="@+id/container"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
 
-</LinearLayout>
+</RelativeLayout>
