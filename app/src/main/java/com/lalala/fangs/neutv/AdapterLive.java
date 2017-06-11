@@ -3,7 +3,6 @@ package com.lalala.fangs.neutv;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,8 +86,8 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
 //    }
 
     void update(int position){
-        Log.e(TAG, "update: position " +String.valueOf(position)
-                +" favorite "+String.valueOf(mLiveList.get(position).getIsFavorite()) );
+//        Log.e(TAG, "update: position " +String.valueOf(position)
+//                +" favorite "+String.valueOf(mLiveList.get(position).getIsFavorite()) );
         if(position < mLiveList.size() && position>=0){
             notifyItemChanged(position);
         }

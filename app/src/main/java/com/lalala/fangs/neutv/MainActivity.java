@@ -35,6 +35,7 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import cn.xfangfang.flyme6.TabStrip;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
             localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
             intentFilter = new IntentFilter();
-            intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE_ALL");
+            intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
             receiver = new FavoriteReceiver();
             localBroadcastManager.registerReceiver(receiver, intentFilter);
         }
@@ -132,15 +133,14 @@ public class MainActivity extends AppCompatActivity {
             if (t.getIsFavorite()) {
                 t.setIsFavorite(false);
                 values.put("isFavorite", "0");
-                Toast.makeText(getContext(), "从收藏中已删除～", Toast.LENGTH_LONG).show();
             } else {
                 t.setIsFavorite(true);
                 values.put("isFavorite", "1");
-                Toast.makeText(getContext(), "加入到我的收藏～", Toast.LENGTH_LONG).show();
             }
             //更新数据库
-            DataSupport.updateAll(Live.class, values, "num = ?", String.valueOf(t.getNum()));
-            intent.putExtra("live_num", t.getNum());
+            DataSupport.updateAll(Live.class, values, "name = ?", t.getName());
+            intent.putExtra("live_name", t.getName());
+            intent.putExtra("live_favorite",t.getIsFavorite());
             localBroadcastManager.sendBroadcast(intent);
             adapter.update(position);
         }
@@ -148,9 +148,10 @@ public class MainActivity extends AppCompatActivity {
         class FavoriteReceiver extends BroadcastReceiver {
             @Override
             public void onReceive(Context context, Intent intent) {
-                int num = intent.getIntExtra("live_num", -1);
-                if (num != -1) {
-                    Live temp = DataSupport.where("num = ?",String.valueOf(num)).findFirst(Live.class);
+                String name = intent.getStringExtra("live_name");
+                boolean isfavorite = intent.getBooleanExtra("live_favorite",false);
+                if(name != null){
+                    Live temp = DataSupport.where("name = ?",name).findFirst(Live.class);
                     if(temp != null){
                         int count = liveList.indexOf(temp);
                         if(count != -1) {
@@ -185,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_all, container, false);
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
             liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
+            deleteSame();
             adapter = new AdapterLive(liveList);
             StaggeredGridLayoutManager sm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(sm);
@@ -210,37 +212,53 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
 
-
-        private static final String TAG = "FindBooksFragment";
-
         private void addToFavorite(int position) {
             Live t = liveList.get(position);
             ContentValues values = new ContentValues();
-            Intent intent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE_ALL");
+            Intent intent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
 
             if (t.getIsFavorite()) {
                 t.setIsFavorite(false);
                 values.put("isFavorite", "0");
-                adapter.remove(position);
             } else {
+                //对于收藏夹，这个程序块不会被运行
                 t.setIsFavorite(true);
                 values.put("isFavorite", "1");
                 adapter.update(position);
             }
             //更新数据库
-            DataSupport.updateAll(Live.class, values, "num = ?", String.valueOf(t.getNum()));
+            DataSupport.updateAll(Live.class, values, "name = ?", t.getName());
 
-            //发送给收藏夹
-            intent.putExtra("live_num", t.getNum());
+            //发送给分类
+            intent.putExtra("live_name", t.getName());
+            intent.putExtra("live_favorite",t.getIsFavorite());
             localBroadcastManager.sendBroadcast(intent);
         }
 
         class FavoriteReceiver extends BroadcastReceiver {
             @Override
             public void onReceive(Context context, Intent intent) {
-                liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
-                adapter.updateAll(liveList);
+                if(intent.getBooleanExtra("live_favorite",true)){
+                    liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
+                    deleteSame();
+                    adapter.updateAll(liveList);
+                }else {
+                    String name = intent.getStringExtra("live_name");
+                    if(name != null){
+                        Live temp = DataSupport.where("name = ?",name).findFirst(Live.class);
+                        if(temp != null){
+                            int position = liveList.indexOf(temp);
+                            adapter.remove(position);
+                        }
+                    }
+                }
             }
+        }
+
+        private static final String TAG = "FavoriteLiveFragment";
+        private void deleteSame(){
+            HashSet<Live> lives = new HashSet<>(liveList);
+            liveList = new ArrayList<>(lives);
         }
 
     }

@@ -10,10 +10,10 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -311,12 +311,12 @@ public class TabStrip extends HorizontalScrollView {
         tvTab.setTextSize(textSize);
         tvTab.setGravity(Gravity.CENTER);
         if(isIndicatorTextBold){
-            tvTab.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            TextPaint tp = tvTab.getPaint();
+            tp.setFakeBoldText(true);
         }
         tvTab.setSingleLine();
         tvTab.setFocusable(true);
         tvTab.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 viewPager.setCurrentItem(position);

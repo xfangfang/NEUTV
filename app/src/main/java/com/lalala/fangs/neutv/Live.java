@@ -83,7 +83,7 @@ public class Live extends DataSupport implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Live) {
-            if (this.getNum() == ((Live) obj).getNum()) {
+            if (this.getName().equals(((Live) obj).getName())) {
                 return true;
             }
             else {
@@ -91,6 +91,12 @@ public class Live extends DataSupport implements Serializable {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+//         return super.hashCode();
+        return 1;
     }
 
 }
