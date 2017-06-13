@@ -3,25 +3,15 @@ package com.lalala.fangs.neutv;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -33,8 +23,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.Arrays;
+
+import cn.xfangfang.videocontroller.VideoController;
 
 import static com.lalala.fang.neutvshow.R.id.videoView;
 
@@ -53,46 +44,14 @@ public class Video extends Activity {
 
     String name; //传递过来的节目名字
     String liveUrl;
+    Live live;
+
     VideoView video;
-    TextView textAll, textTvName, textChange, textNow;
     ListView lv2;
-    SeekBar sb;
-    ProgressBar pb;
-    RelativeLayout lineTop;
-    LinearLayout  lineBottom;
-    Button buttonPause, buttonClose;
+    VideoController videoController;
+    LinearLayout linearLayout;
 
-    private Handler handler = new Handler();//每个一秒取一次当前播放时间
-    private Runnable run = new Runnable() {
-        public void run() {
-//            Blurry.delete((ViewGroup) findViewById(R.id.video_content));
-//            Blurry.with(Video.this)
-//                    .radius(25)
-//                    .sampling(2)
-//                    .async()
-//                    .animate(500)
-//                    .onto((ViewGroup) findViewById(R.id.video_content));
-            long a = video.getCurrentPosition();
-            textNow.setText(intToString((int) a / 1000));
-            sb.setProgress((int) a / 1000);
-            handler.postDelayed(run, 1000);
-        }
-    };
 
-    private Handler handler2 = new Handler();//每隔一秒时间加一
-    int tim = 0;
-    private Runnable autoGone = new Runnable() {
-        public void run() {
-            if (!isOnPlay || isTvNameOn) {
-                tim = 0;
-            } else tim++;
-            if (tim == 4) {
-                iCantSee();
-                tim = 0;
-            }
-            handler.postDelayed(autoGone, 1000);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,22 +60,77 @@ public class Video extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_video);
+
         video = (VideoView) findViewById(videoView);
-        textAll = (TextView) findViewById(R.id.textAll);
-        textNow = (TextView) findViewById(R.id.textNow);
-        textTvName = (TextView) findViewById(R.id.textTvName);
-        lineBottom = (LinearLayout) findViewById(R.id.controlerBottom);
-        textChange = (TextView) findViewById(R.id.textChange);
-        lineTop = (RelativeLayout) findViewById(R.id.controlerTop);
         lv2 = (ListView) findViewById(R.id.listView2);
-        sb = (SeekBar) findViewById(R.id.seekBar);
-        pb = (ProgressBar) findViewById(R.id.progressBar);
-        buttonPause = (Button) findViewById(R.id.buttonPause);
-        buttonClose = (Button) findViewById(R.id.buttonClose);
+        videoController = (VideoController) findViewById(R.id.video_controller);
+        linearLayout = (LinearLayout) findViewById(R.id.line_tv_show);
 
 
-        Bundle bundle = this.getIntent().getExtras();
-        liveUrl = bundle.getString("Name");
+
+        live = (Live) getIntent().getSerializableExtra("live");
+        if(live != null){
+            liveUrl = live.getUrllist();
+        }
+
+        videoController.setTitle(live.getName());
+        videoController.setVideoView(video);
+        videoController.setFavorite(live.getIsFavorite());
+        videoController.setIsLiveOrNot(true);
+        videoController.setOnClickEventListener(new VideoController.OnClickEventListener() {
+            @Override
+            public void onBack() {
+                finish();
+            }
+
+            @Override
+            public void onMenu() {
+                Toast.makeText(getApplicationContext(), "换源", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onList() {
+                Toast.makeText(getApplicationContext(), "频道", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onBeforeList() {
+                linearLayout.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "回看", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFavorite() {
+                if(live.getIsFavorite()){
+                    videoController.setFavorite(true);
+                }else{
+                    videoController.setFavorite(false);
+                }
+            }
+        });
+        videoController.setOnStateListener(new VideoController.OnStateListener() {
+            @Override
+            public void onError() {
+                Toast.makeText(getApplicationContext(), "不能播放此视频", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+            @Override
+            public void onPause() {
+
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onPrepared() {
+
+            }
+        });
+
         String[] n = liveUrl.split("/");
         int q = n.length;
         int len = n[q - 1].length();
@@ -126,94 +140,11 @@ public class Video extends Activity {
         playTv(liveUrl);
         iniList();
 
-        textTvName.setText(liveTvName);
         try {
             getHistoryList();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                textTvName.setText(tvNameNow);
-                pb.setVisibility(View.GONE);
-                long a = video.getDuration();
-                sb.setMax((int) a / 1000);
-                textAll.setText(intToString((int) a / 1000));
-                isOnPlay = true;
-
-            }
-        });
-
-        video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                Toast.makeText(getApplicationContext(), "不能播放此视频", Toast.LENGTH_LONG).show();
-                finish();
-                return false;
-            }
-        });
-
-
-        video.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!touchFlag) {
-                    printScreen(v);
-                    tim = 0;
-                    lineBottom.setVisibility(View.VISIBLE);
-                    lineTop.setVisibility(View.VISIBLE);
-                    touchFlag = true;
-
-                } else {
-                    lineBottom.setVisibility(View.GONE);
-                    lineTop.setVisibility(View.GONE);
-                    touchFlag = false;
-                }
-                return false;
-            }
-        });
-
-
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int a = 0;
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                pb.setVisibility(View.GONE);
-                if (fromUser) {
-                    textNow.setText(intToString(progress));
-                    textChange.setVisibility(View.VISIBLE);
-                    if (progress > a)
-                        textChange.setText("+" + intToString(progress - a));
-                    else
-                        textChange.setText("-" + intToString(a - progress));
-                } else {
-                    isOnPlay = true;
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                a = seekBar.getProgress();
-                textChange.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                textChange.setVisibility(View.GONE);
-                pb.setVisibility(View.VISIBLE);
-                int a = seekBar.getProgress();
-                video.seekTo(a * 1000);
-                video.start();
-                isOnPlay = false;
-            }
-        });
-
-        handler.post(run);
-        handler2.post(autoGone);
-
 
     }
 
@@ -226,6 +157,18 @@ public class Video extends Activity {
         super.onResume();
     }
 
+    @Override
+    public void onBackPressed() {
+        if(linearLayout.isShown()){
+            linearLayout.setVisibility(View.INVISIBLE);
+            return;
+        }else if(videoController.isShown()){
+            videoController.contentInvisible();
+            return;
+        }
+        super.onBackPressed();
+    }
+
     //横竖屏切换时不重载
     @Override
     public void onConfigurationChanged(Configuration config) {
@@ -235,9 +178,6 @@ public class Video extends Activity {
     Document doc;
 
     public void getHistoryList() throws IOException {
-//        JSONArray json2 = (JSONArray) JSONSerializer.toJSON("[1,2,3]");
-//        List java2 = (List) JSONSerializer.toJava(json2);
-//        System.out.println("——用JSONSerializer将json转换list——" + java2);
 
         new Thread(new Runnable() {
             @Override
@@ -295,92 +235,39 @@ public class Video extends Activity {
 
     private static final String TAG = "Video";
 
-    public void pause(View view) {
-        if (video.isPlaying()) {
-            buttonPause.setText("播放");
-            video.pause();
-            isOnPlay = false;
-        } else {
-            buttonPause.setText("暂停");
-            video.start();
-            isOnPlay = true;
-        }
-    }
 
     public void playTv(String url) {
         Uri uri = Uri.parse(url);
-        Log.e(TAG, "playTv: " + url);
         video.setVideoURI(uri);
         video.start();
-//        handler.post(run);
-//        handler.removeCallbacks(run);
-
     }
 
-    public void closeWin(View view) {
-        finish();
-    }
 
-    public void showTv(View view) {
-        if (isTvNameOn) {
-            LinearLayout l = (LinearLayout) findViewById(R.id.LineTvShow);
-            l.setVisibility(View.GONE);
-            isTvNameOn = false;
-            textTvName.setText(tvNameNow);
-        } else {
-            LinearLayout l = (LinearLayout) findViewById(R.id.LineTvShow);
-            l.setVisibility(View.VISIBLE);
-            isTvNameOn = true;
-            textTvName.setText(dates[dayNow]);
-        }
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_POWER) {
-            video.pause();
-            return true;
-        }
-
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            if (!isTvNameOn) {
-                finish();
-            } else {
-                LinearLayout l = (LinearLayout) findViewById(R.id.LineTvShow);
-                l.setVisibility(View.GONE);
-                isTvNameOn = false;
-                textTvName.setText(tvNameNow);
-            }
-            return true;
-        }
-        return false;
-    }
 
     public void s(final int i) {
         dayNow = i;
-        final String tvName = textTvName.getText().toString();
         lv2.setAdapter(new ArrayAdapter<>(Video.this, android.R.layout.simple_list_item_1, d[i]));
         lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                LinearLayout l = (LinearLayout) findViewById(R.id.LineTvShow);
+                LinearLayout l = (LinearLayout) findViewById(R.id.line_tv_show);
                 l.setVisibility(View.GONE);
                 isTvNameOn = false;
                 if (h[i][arg2].contains("newplayer")) {
-                    if (textTvName.getText().toString().equals(liveTvName.split(" ")[1]))
+                    if (live.getName().equals(liveTvName.split(" ")[1]))
                         Toast.makeText(getApplicationContext(), "正在直播...", Toast.LENGTH_SHORT).show();
                     else {
                         playTv("http://media2.neu6.edu.cn/hls/" + name + ".m3u8");
-                        textTvName.setText(liveTvName);
+                        videoController.setTitle(liveTvName);
                     }
                 } else if (!h[i][arg2].equals("")) {
                     playTv("http://media2.neu6.edu.cn/review/program-" + h[i][arg2].substring(23, 45) + name + ".m3u8");
-                    pb.setVisibility(View.VISIBLE);
                     isOnPlay = false;
                     tvNameNow = dates[dayNow] + " " + d[i][arg2];
-                    textTvName.setText(tvNameNow);
+                    videoController.setTitle(tvNameNow);
                     dayNow = i;
                 } else {
-                    textTvName.setText(tvName);
+                    videoController.setTitle(live.getName());
                     Toast.makeText(getApplicationContext(), "没找到资源呀...", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -389,43 +276,43 @@ public class Video extends Activity {
 
     public void s1(View view) {
         s(0);
-        textTvName.setText(dates[0]);
+        videoController.setTitle(dates[0]);
     }
 
     public void s2(View view) {
         s(1);
-        textTvName.setText(dates[1]);
+        videoController.setTitle(dates[1]);
     }
 
     public void s3(View view) {
         s(2);
-        textTvName.setText(dates[2]);
+        videoController.setTitle(dates[2]);
 
     }
 
     public void s4(View view) {
         s(3);
-        textTvName.setText(dates[3]);
+        videoController.setTitle(dates[3]);
     }
 
     public void s5(View view) {
         s(4);
-        textTvName.setText(dates[4]);
+        videoController.setTitle(dates[4]);
     }
 
     public void s6(View view) {
         s(5);
-        textTvName.setText(dates[5]);
+        videoController.setTitle(dates[5]);
     }
 
     public void s7(View view) {
         s(6);
-        textTvName.setText(dates[6]);
+        videoController.setTitle(dates[6]);
     }
 
     public void s8(View view) {
         s(7);
-        textTvName.setText(dates[7]);
+        videoController.setTitle(dates[7]);
     }
 
     public void iniList() {
@@ -447,51 +334,5 @@ public class Video extends Activity {
         }).start();
     }
 
-    public String intToString(int t) {
-        String a = "00:00:00";
-        int sec = t % 60;
-        t /= 60;
-        int min = t % 60;
-        int hour = t / 60;
-        if (hour == 0)
-            a = new DecimalFormat("00").format(min) + ":" + new DecimalFormat("00").format(sec);
-        else
-            a = new DecimalFormat("00").format(hour) + ":" + new DecimalFormat("00").format(min) + ":" + new DecimalFormat("00").format(sec);
-        return a;
-    }
-
-    public void iCantSee() {
-        touchFlag = false;
-        lineBottom.setVisibility(View.GONE);
-        lineTop.setVisibility(View.GONE);
-    }
-
-    public void printScreen(View view) {
-        String imgPath = "/sdcard/test.png";
-//        view.setDrawingCacheEnabled(true);
-//        view.buildDrawingCache();
-//        Bitmap bitmap = view.getDrawingCache();
-
-//        try {
-//            MediaMetadataRetriever rev = new MediaMetadataRetriever();
-//            Uri uri = Uri.parse(liveUrl);
-//            rev.setDataSource(Video.this, uri); //这里第一个参数需要Context，传this指针
-//            Bitmap bitmap = rev.getFrameAtTime(((VideoView) view).getCurrentPosition() * 1000,
-//                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-//            if (bitmap != null) {
-//                Log.e(TAG, "printScreen: get" );
-//                try {
-//                    FileOutputStream out = new FileOutputStream(imgPath);
-//                    bitmap.compress(Bitmap.CompressFormat.PNG, 100,
-//                            out);
-//                } catch (Exception e) {
-//                    Log.e(TAG, "printScreen: something happend i don't know" ,e);
-//                }
-//            }
-//        }catch (Exception e){
-//            Log.e(TAG, "printScreen: lalala ",e );
-//        }
-
-    }
 
 }

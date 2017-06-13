@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/base_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#40000000">
+
+        <RelativeLayout
+            android:id="@+id/tool_up"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="#0000"
+                android:padding="8dp"
+                android:src="@drawable/ic_action_arrow_back" />
+
+            <TextView
+                android:id="@+id/txv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/btn_back"
+                android:layout_toRightOf="@+id/btn_back"
+                android:gravity="center"
+                android:textColor="#FEFEFE"
+                android:textStyle="bold"
+                tools:text="东北大学惊现百年一遇计算机天才" />
+
+            <ImageButton
+                android:id="@+id/btn_love"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/btn_menu"
+                android:layout_toStartOf="@+id/btn_menu"
+                android:background="#0000"
+                android:padding="8dp"
+                android:src="@drawable/ic_action_favorite_border" />
+
+            <ImageButton
+                android:id="@+id/btn_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="#0000"
+                android:padding="8dp"
+                android:src="@drawable/ic_action_setting" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/tool_down"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="#0000"
+                android:padding="8dp"
+                android:src="@drawable/ic_action_pause" />
+
+            <TextView
+                android:id="@+id/txv_start_time"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:textColor="#FEFEFE"
+                android:textStyle="bold"
+                tools:text="00:00" />
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/txv_end_time"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:textColor="#FEFEFE"
+                android:textStyle="bold"
+                tools:text="12:34" />
+
+            <ImageButton
+                android:id="@+id/btn_before_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="4dp"
+                android:background="#0000"
+                android:padding="4dp"
+                android:src="@drawable/ic_action_before" />
+
+            <ImageButton
+                android:id="@+id/btn_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="4dp"
+                android:background="#0000"
+                android:padding="4dp"
+                android:src="@drawable/ic_action_list" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txv_center_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#FEFEFE"
+            android:visibility="invisible"
+            tools:text="00:00" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+</FrameLayout>

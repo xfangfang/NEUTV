@@ -1,1 +1,1 @@
-include ':app', ':tabstrip'
+include ':app', ':tabstrip', ':videocontroller'

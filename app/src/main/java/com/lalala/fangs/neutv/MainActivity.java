@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(View view, int position) {
                     Intent intent = new Intent(getContext(), Video.class);
-                    intent.putExtra("Name", liveList.get(position).getUrllist());
+                    intent.putExtra("live",liveList.get(position));
                     startActivity(intent);
                 }
 
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(View view, int position) {
                     Intent intent = new Intent(getContext(), Video.class);
-                    intent.putExtra("Name", liveList.get(position).getUrllist());
+                    intent.putExtra("live",liveList.get(position));
                     startActivity(intent);
                 }
 
@@ -263,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
         private ArrayList<Fragment> datas;
         private ArrayList<String> titles;
 
@@ -294,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    class getUpdateLive extends AsyncTask<String, Integer, Boolean> {
+    private class getUpdateLive extends AsyncTask<String, Integer, Boolean> {
         private static final String TAG = "getUpdateLive";
 
         @Override
@@ -347,13 +345,14 @@ public class MainActivity extends AppCompatActivity {
                 mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
                 ArrayList<Fragment> datas = new ArrayList<>();
                 ArrayList<String> titles = new ArrayList<>();
+                titles.add("收藏");
+                datas.add(new FavoriteLiveFragment());
+
                 for(Type i :
                         typeList){
                     titles.add(i.getName().substring(0,2));
                     datas.add(new AllLiveFragment(i.getId()));
                 }
-                titles.add("收藏");
-                datas.add(new FavoriteLiveFragment());
 
                 mSectionsPagerAdapter.setData(datas,titles);
 
@@ -361,6 +360,8 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setAdapter(mSectionsPagerAdapter);
 
                 mViewPager.setOffscreenPageLimit(2);
+                //将收藏放在-1屏
+                mViewPager.setCurrentItem(1);
 
                 tabStrip = (TabStrip) findViewById(R.id.tabstrip);
                 tabStrip.setViewPager(mViewPager);
