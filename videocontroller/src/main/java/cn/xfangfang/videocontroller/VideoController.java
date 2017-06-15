@@ -112,12 +112,11 @@ public class VideoController extends FrameLayout{
 
     private Runnable autoGone = new Runnable() {
         public void run() {
-            if(!videoView.isPlaying()){
+            if(!videoView.isPlaying() || progressBar.isShown()){
                 reSetAutoGoneTime();
             }
             if (autoGoneTime++ == 4) {
                 contentInvisible();
-                progressBar.setVisibility(INVISIBLE);
             }
             handler_autoGone.postDelayed(autoGone, 1000);
         }
@@ -190,6 +189,10 @@ public class VideoController extends FrameLayout{
                         txv_centerTime.setText("+ " + intToString(progress - a));
                     else
                         txv_centerTime.setText("- " + intToString(a - progress));
+                }else{
+                    if(progressBar.isShown()) {
+                        progressBar.setVisibility(INVISIBLE);
+                    }
                 }
             }
 

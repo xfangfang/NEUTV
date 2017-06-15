@@ -78,7 +78,7 @@
 
             <TextView
                 android:id="@+id/txv_start_time"
-                android:layout_width="48dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="center"
@@ -95,7 +95,7 @@
 
             <TextView
                 android:id="@+id/txv_end_time"
-                android:layout_width="48dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="center"

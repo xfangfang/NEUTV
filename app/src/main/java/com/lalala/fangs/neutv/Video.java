@@ -123,7 +123,7 @@ public class Video extends AppCompatActivity {
         videoController.setTitle(live.getName());
         videoController.setVideoView(video);
         videoController.setFavorite(live.getIsFavorite());
-//        videoController.setIsLiveOrNot(true);
+        videoController.setIsLiveOrNot(true);
         videoController.setOnClickEventListener(new VideoController.OnClickEventListener() {
             @Override
             public void onBack() {
@@ -238,6 +238,7 @@ public class Video extends AppCompatActivity {
                 new getLiveBefore().execute(name);
                 videoController.setTitle(one.getName());
                 linearLayout_show.setVisibility(View.INVISIBLE);
+                videoController.setIsLiveOrNot(true);
             }
         };
         t1.setOnGoToAnotherTVListener(gotoAnotherTVListener);
@@ -426,10 +427,18 @@ public class Video extends AppCompatActivity {
                             + one.get(0) + "-"
                             + one.get(1) + "-" + parentActivity.name + ".m3u8";
 
-                    parentActivity.playTv(url);
-                    parentActivity.videoController.setTitle(one.get(2));
-                    parentActivity.videoController.contentVisible();
-                    parentActivity.linearLayout_before.setVisibility(View.INVISIBLE);
+                    Long timeStart = Long.valueOf(one.get(0))*1000L;
+                    Long timeNow = System.currentTimeMillis();
+                    Log.e(TAG, "onItemClick: "+timeNow+"---"+timeStart );
+                    if(timeNow > timeStart+60000) {
+                        parentActivity.playTv(url);
+                        parentActivity.videoController.setTitle(one.get(2));
+                        parentActivity.videoController.contentVisible();
+                        parentActivity.linearLayout_before.setVisibility(View.INVISIBLE);
+                        parentActivity.videoController.setIsLiveOrNot(false);
+                    }else{
+                        Toast.makeText(getContext(), "节目还未开始", Toast.LENGTH_LONG).show();
+                    }
                 }
 
                 @Override
