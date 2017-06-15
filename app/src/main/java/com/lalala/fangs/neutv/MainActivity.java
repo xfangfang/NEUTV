@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
     public static class AllLiveFragment extends Fragment {
 
         private RecyclerView recyclerView;
@@ -119,6 +125,13 @@ public class MainActivity extends AppCompatActivity {
             intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
             receiver = new FavoriteReceiver();
             localBroadcastManager.registerReceiver(receiver, intentFilter);
+        }
+
+        @Override
+        public void onDestroy() {
+            localBroadcastManager.unregisterReceiver(receiver);
+            Log.e(TAG, "onDestroy: 销毁频道列表" );
+            super.onDestroy();
         }
 
         private static final String TAG = "FindBooksFragment";
@@ -319,6 +332,11 @@ public class MainActivity extends AppCompatActivity {
                 }.getType());
                 typeList = gson.fromJson(typeData.toString(), new TypeToken<ArrayList<Type>>() {
                 }.getType());
+
+                //储存type信息
+                SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+                editor.putString("type",typeData.toString());
+                editor.apply();
 
             } catch (IOException | JSONException e) {
                 e.printStackTrace();

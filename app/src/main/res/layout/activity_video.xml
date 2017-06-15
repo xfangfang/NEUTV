@@ -24,85 +24,70 @@
     <cn.xfangfang.videocontroller.VideoController
         android:id="@+id/video_controller"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
 
     <LinearLayout
-        android:id="@+id/line_tv_show"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="32dp"
-        android:visibility="gone">
+        android:id="@+id/list_layout_before"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="invisible"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s1"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s2"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s3"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s4"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s5"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s6"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s7"
-                android:text="◉" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="s8"
-                android:text="◉" />
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/listView2"
-            android:layout_width="match_parent"
+        <q.rorbin.verticaltablayout.VerticalTabLayout
+            android:id="@+id/tablayout_before_list"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:background="#90f0f0f0" />
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:background="#EDEDED"
+            app:indicator_color="#FFFFFF"
+            app:indicator_corners="4dp"
+            app:tab_margin="10dp"
+            app:indicator_gravity="fill"
+            app:tab_mode="scrollable"
+            app:tabTextColor="#80FEFEFE"
+            app:tabSelectedTextColor="#FEFEFE"/>
+
+        <android.support.v4.view.ViewPager
+            android:background="@color/cardview_light_background"
+            android:id="@+id/view_pager_before_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/list_layout_show"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="invisible"
+        android:orientation="horizontal">
+
+        <q.rorbin.verticaltablayout.VerticalTabLayout
+            android:id="@+id/tablayout_show"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:background="#EDEDED"
+            app:indicator_color="#FFFFFF"
+            app:indicator_corners="4dp"
+            app:tab_margin="10dp"
+            app:indicator_gravity="fill"
+            app:tab_mode="scrollable"
+            app:tabTextColor="#80FEFEFE"
+            app:tabSelectedTextColor="#FEFEFE"/>
+
+        <android.support.v4.view.ViewPager
+            android:background="@color/cardview_light_background"
+            android:id="@+id/view_pager_show"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
 
 </RelativeLayout>

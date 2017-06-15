@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -89,11 +90,17 @@ public class VideoController extends FrameLayout{
 
 
     public void contentInvisible(){
+        if(stateListener != null){
+            stateListener.onInvisible();
+        }
         contentLayout.setVisibility(INVISIBLE);
         handler_autoGone.removeCallbacks(autoGone);
     }
 
-    private void contentVisible(){
+    public void contentVisible(){
+        if(stateListener != null){
+            stateListener.onVisible();
+        }
         contentLayout.setVisibility(VISIBLE);
         reSetAutoGoneTime();
         handler_autoGone.post(autoGone);
@@ -107,11 +114,10 @@ public class VideoController extends FrameLayout{
         public void run() {
             if(!videoView.isPlaying()){
                 reSetAutoGoneTime();
-            }else{
-                progressBar.setVisibility(INVISIBLE);
             }
             if (autoGoneTime++ == 4) {
                 contentInvisible();
+                progressBar.setVisibility(INVISIBLE);
             }
             handler_autoGone.postDelayed(autoGone, 1000);
         }
@@ -161,7 +167,9 @@ public class VideoController extends FrameLayout{
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                Log.e(TAG, "onPrepared: 准备好啦" );
                 long a = videoView.getDuration();
+                reSetAutoGoneTime();
                 progressBar.setVisibility(INVISIBLE);
                 seekBar.setMax((int) a / 1000);
                 txv_end_time.setText(intToString((int) a / 1000));
@@ -197,6 +205,7 @@ public class VideoController extends FrameLayout{
             public void onStopTrackingTouch(SeekBar seekBar) {
                 txv_centerTime.setVisibility(INVISIBLE);
                 progressBar.setVisibility(VISIBLE);
+                videoView.pause();
                 videoView.seekTo(seekBar.getProgress() * 1000);
                 videoView.start();
             }
@@ -252,6 +261,7 @@ public class VideoController extends FrameLayout{
             @Override
             public void onClick(View v) {
                 if(clickEventListener != null){
+                    contentInvisible();
                     clickEventListener.onList();
                 }
             }
@@ -261,6 +271,7 @@ public class VideoController extends FrameLayout{
             @Override
             public void onClick(View v) {
                 if(clickEventListener != null){
+                    contentInvisible();
                     clickEventListener.onBeforeList();
                 }
             }
@@ -281,6 +292,7 @@ public class VideoController extends FrameLayout{
             public void onClick(View v) {
                 if(clickEventListener != null){
                     clickEventListener.onMenu();
+                    contentInvisible();
                     reSetAutoGoneTime();
                 }
             }
@@ -293,6 +305,41 @@ public class VideoController extends FrameLayout{
         }else{
             toHate();
         }
+    }
+
+    public void pause(){
+        if(videoView != null){
+            if(videoView.isPlaying()){
+                videoView.pause();
+                ib_control.setImageResource(R.drawable.ic_action_start);
+                if(stateListener != null){
+                    stateListener.onPause();
+                }
+                reSetAutoGoneTime();
+            }
+        }
+    }
+
+    public void start(){
+        if(videoView != null) {
+            if(!videoView.isPlaying()){
+                progressBar.setVisibility(VISIBLE);
+                videoView.start();
+                ib_control.setImageResource(R.drawable.ic_action_pause);
+                if (stateListener != null) {
+                    stateListener.onStart();
+                }
+                reSetAutoGoneTime();
+            }
+        }
+    }
+
+    public void ProgressBarVisible(){
+        progressBar.setVisibility(VISIBLE);
+    }
+
+    public void ProgressBarInvisible(){
+        progressBar.setVisibility(INVISIBLE);
     }
 
     private void toFavorite(){
@@ -330,7 +377,10 @@ public class VideoController extends FrameLayout{
         void onPause();
         void onStart();
         void onPrepared();
+        void onVisible();
+        void onInvisible();
     }
+
 
     private OnStateListener stateListener;
     private OnClickEventListener clickEventListener;
