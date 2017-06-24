@@ -2,12 +2,12 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-(下载链接)[http://www.baidu.com]
+[下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/直视.apk)
 交流群：532607431
 
 ### 简介
 
-!(shot)[http://ac-HSNl7zbI.clouddn.com/7jyamj72nNNTFaVEWMTMDt8lkbASgeIfR7fRchqr.jpg]
+![shot](http://ac-HSNl7zbI.clouddn.com/7jyamj72nNNTFaVEWMTMDt8lkbASgeIfR7fRchqr.jpg)
 
 直视是一款集成电视直播与回看的Android应用，拥有长达七天的直播视频回看期限，在拥有IPV6校园网络的各个地方都能便捷的观看电视节目。
 
@@ -35,6 +35,6 @@
 
 ### 合作者
 
-(timberswift)[https://github.com/timberswift]
-(tianzhipengfei)[https://github.com/tianzhipengfei]
+[timberswift](https://github.com/timberswift)
+[tianzhipengfei](https://github.com/tianzhipengfei)
 北影 老头子
