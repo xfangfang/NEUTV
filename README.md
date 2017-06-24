@@ -2,8 +2,11 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/直视.apk)
-交流群：532607431
+[直视下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/直视.apk)
+
+[东大网关君下载链接](https://github.com/xfangfang/NeuTV/blob/master/com.lalala.fangs.neunet.apk)
+
+直视交流群：532607431
 
 ### 简介
 
@@ -36,5 +39,7 @@
 ### 合作者
 
 [timberswift](https://github.com/timberswift)
+
 [tianzhipengfei](https://github.com/tianzhipengfei)
+
 北影 老头子
