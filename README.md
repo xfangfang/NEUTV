@@ -7,7 +7,7 @@
 
 ### 简介
 
-![shot](http://ac-HSNl7zbI.clouddn.com/7jyamj72nNNTFaVEWMTMDt8lkbASgeIfR7fRchqr.jpg)
+![shot](http://ac-HSNl7zbI.clouddn.com/UDPYPPnR6Y8Xzqn6KPQWFAADchqy6jl3XhFjBVDj.jpg)
 
 直视是一款集成电视直播与回看的Android应用，拥有长达七天的直播视频回看期限，在拥有IPV6校园网络的各个地方都能便捷的观看电视节目。
 
