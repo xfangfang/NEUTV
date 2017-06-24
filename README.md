@@ -4,7 +4,7 @@
 
 [直视下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/直视.apk)
 
-[东大网关君下载链接](https://github.com/xfangfang/NeuTV/blob/master/com.lalala.fangs.neunet.apk)
+[东大网关君下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/com.lalala.fangs.neunet.apk)
 
 直视交流群：532607431
 
