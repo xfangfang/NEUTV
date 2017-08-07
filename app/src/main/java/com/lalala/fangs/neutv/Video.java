@@ -302,8 +302,8 @@ public class Video extends AppCompatActivity {
             linearLayout_show.setVisibility(View.INVISIBLE);
             return;
         } else if (videoController.isShown()) {
-            videoController.contentInvisible();
-            return;
+//            videoController.contentInvisible();
+//            return;
         }
         super.onBackPressed();
     }
@@ -520,7 +520,7 @@ public class Video extends AppCompatActivity {
 
         @Override
         public void onDestroy() {
-            Log.e(TAG, "onDestroy: "+liveList.size()+"-"+liveList.get(0).getItemid()+"-"+isFavoritePage );
+//            Log.e(TAG, "onDestroy: "+liveList.size()+"-"+liveList.get(0).getItemid()+"-"+isFavoritePage );
             localBroadcastManager.unregisterReceiver(receiver);
             super.onDestroy();
         }
