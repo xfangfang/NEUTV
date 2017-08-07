@@ -2,9 +2,9 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/直视.apk)
+[直视下载链接](http://files.cnblogs.com/files/xfangs/tv.apk)
 
-[东大网关君下载链接](https://raw.githubusercontent.com/xfangfang/NeuTV/master/com.lalala.fangs.neunet.apk)
+[东大网关君下载链接](http://files.cnblogs.com/files/xfangs/github.apk)
 
 直视交流群：532607431
 
@@ -28,7 +28,7 @@
 - 支持TV端
 - 加入节目搜索
 - 提升视频加载速度
-- 解决华为部分机型返回节目列表时直接退出的BUG
+- 加入还源
 
 
 ### 致谢

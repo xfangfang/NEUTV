@@ -1,5 +1,6 @@
 package com.lalala.fangs.neutv;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -73,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
         super.onPostResume();
     }
 
+    @SuppressLint("ValidFragment")
     public static class AllLiveFragment extends Fragment {
+
+        public AllLiveFragment(){}
 
         private RecyclerView recyclerView;
 
@@ -177,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("ValidFragment")
     public static class FavoriteLiveFragment extends Fragment {
 
         public FavoriteLiveFragment() {

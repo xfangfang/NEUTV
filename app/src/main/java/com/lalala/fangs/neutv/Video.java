@@ -397,6 +397,7 @@ public class Video extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ValidFragment")
     public static class TvListFragment extends Fragment {
 
         public TvListFragment(ArrayList<ArrayList<String>> beforeList) {
@@ -452,6 +453,7 @@ public class Video extends AppCompatActivity {
 
     }
 
+    @SuppressLint("ValidFragment")
     public static class TvShowFragment extends Fragment {
 
         public TvShowFragment(String id) {
