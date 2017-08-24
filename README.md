@@ -2,11 +2,11 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视下载链接](http://files.cnblogs.com/files/xfangs/tv.apk)
+[直视tv 下载链接 v2.0](https://files.cnblogs.com/files/xfangs/neutv2.0.apk)
 
-[东大网关君下载链接](http://files.cnblogs.com/files/xfangs/github.apk)
+[东大网关君 下载链接 v3.1](https://files.cnblogs.com/files/xfangs/kuan3.1.apk)
 
-直视交流群：532607431
+直视&网关君交流群：532607431
 
 ### 简介
 
