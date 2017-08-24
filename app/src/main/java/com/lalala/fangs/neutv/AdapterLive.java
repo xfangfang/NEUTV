@@ -1,7 +1,6 @@
 package com.lalala.fangs.neutv;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -125,11 +124,10 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Live live = mLiveList.get(position);
         holder.liveName.setText(live.getName());
-//        Log.e(TAG, "onBindViewHolder: "+live.getName() );
         if(live.getIsFavorite()){
-            holder.favoriteImg.setBackgroundColor(Color.parseColor("#FF0000"));
+            holder.favoriteImg.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_favorite));
         }else{
-            holder.favoriteImg.setBackgroundColor(Color.parseColor("#000000"));
+            holder.favoriteImg.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_favorite_border_balck));
         }
 
 //        "http://media2.neu6.edu.cn/hls/cctv1hd.m3u8#http://media2.neu6.edu.cn/hls/jlu_cctv1hd.m3u8"
@@ -142,8 +140,6 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
         long time=System.currentTimeMillis();
             Glide.with(context)
                     .load("http://hdtv.neu6.edu.cn/wall/img/"+ans+"_s.png?time="+String.valueOf((time-5000)/60000))
-//                    .skipMemoryCache(true)
-//                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .placeholder(R.color.cardview_dark_background)
                     .error(R.color.colorPrimary)
                     .into(holder.img);

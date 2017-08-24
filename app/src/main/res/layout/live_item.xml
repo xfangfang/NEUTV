@@ -16,14 +16,21 @@
         <TextView
             android:id="@+id/livename"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="CCTV1" />
+            android:text="CCTV1"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/favorite"
-            android:layout_width="4dp"
-            android:layout_height="4dp"/>
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/ic_action_favorite_border_balck"/>
 
         <ImageView
             android:layout_below="@+id/livename"
