@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -54,6 +55,7 @@ import okhttp3.Request;
 import q.rorbin.verticaltablayout.VerticalTabLayout;
 
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.lalala.fang.neutvshow.R.id.videoView;
 import static org.litepal.LitePalApplication.getContext;
 
@@ -62,10 +64,11 @@ public class Video extends AppCompatActivity {
     HashMap<String, ArrayList<ArrayList<String>>> beforeList;
     ArrayList<String> tvDateList;
     ArrayList<Type> typeList;
-    List<String> differentRes;
+    ArrayList<String> urlList;
+    String liveUrl;
+    int urlIndex;
 
     String name; //传递过来的节目名字
-    String liveUrl;
     Live live;
 
     VideoView video;
@@ -74,6 +77,9 @@ public class Video extends AppCompatActivity {
     ViewPager viewPager_before, viewPager_show;
     VerticalTabLayout tabLayout_before, tabLayout_show;
     PagerAdapter pagerAdapter;
+    private LinearLayout layoutSources;
+    private LinearLayout videoContent;
+    private LinearLayout layoutSetting;
 
     LocalBroadcastManager localBroadcastManager;
 
@@ -96,11 +102,16 @@ public class Video extends AppCompatActivity {
         videoController = (VideoController) findViewById(R.id.video_controller);
         linearLayout_before = (LinearLayout) findViewById(R.id.list_layout_before);
         linearLayout_show = (LinearLayout) findViewById(R.id.list_layout_show);
+        videoContent = (LinearLayout) findViewById(R.id.video_content);
+        layoutSetting = (LinearLayout) findViewById(R.id.layout_setting);
+
 
         viewPager_before = (ViewPager) findViewById(R.id.view_pager_before_list);
         viewPager_show = (ViewPager) findViewById(R.id.view_pager_show);
         tabLayout_before = (VerticalTabLayout) findViewById(R.id.tablayout_before_list);
         tabLayout_show = (VerticalTabLayout) findViewById(R.id.tablayout_show);
+        layoutSources = (LinearLayout) findViewById(R.id.layout_sources);
+
 
 
         video.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
@@ -112,7 +123,8 @@ public class Video extends AppCompatActivity {
 
 
         live = (Live) getIntent().getSerializableExtra("live");
-        liveUrl = live != null ? live.getUrllist() : "";
+        genUrls();
+
         Gson gson = new Gson();
 
         SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
@@ -132,19 +144,17 @@ public class Video extends AppCompatActivity {
 
             @Override
             public void onMenu() {
-                Toast.makeText(getApplicationContext(), "换源", Toast.LENGTH_LONG).show();
+                layoutSetting.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onList() {
                 linearLayout_show.setVisibility(View.VISIBLE);
-                Toast.makeText(getApplicationContext(), "频道", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onBeforeList() {
                 linearLayout_before.setVisibility(View.VISIBLE);
-                Toast.makeText(getApplicationContext(), "回看", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -171,8 +181,14 @@ public class Video extends AppCompatActivity {
         videoController.setOnStateListener(new VideoController.OnStateListener() {
             @Override
             public void onError() {
-                Toast.makeText(getApplicationContext(), "不能播放此视频", Toast.LENGTH_LONG).show();
-                finish();
+                urlIndex++;
+                if(urlIndex < urlList.size()) {
+                    Toast.makeText(getApplicationContext(), "当前源不可用 正在自动切换", Toast.LENGTH_LONG).show();
+                    playTv(urlList.get(urlIndex));
+                }else{
+                    Toast.makeText(getApplicationContext(), "资源出了点问题", Toast.LENGTH_LONG).show();
+                    finish();
+                }
             }
 
             @Override
@@ -199,6 +215,9 @@ public class Video extends AppCompatActivity {
                 if (linearLayout_show.isShown()) {
                     linearLayout_show.setVisibility(View.INVISIBLE);
                 }
+                if(layoutSetting.isShown()){
+                    layoutSetting.setVisibility(View.INVISIBLE);
+                }
             }
 
             @Override
@@ -207,12 +226,13 @@ public class Video extends AppCompatActivity {
             }
         });
 
-        differentRes = getDiffRes(liveUrl);
-        liveUrl = differentRes.get(0);
+        if(urlIndex == -1){
+            Toast.makeText(getApplicationContext(),"资源出了点问题",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        liveUrl = urlList.get(urlIndex);
+
         name = getName(liveUrl);
-
-
-        Log.e(TAG, "onCreate: " + name);
 
         playTv(liveUrl);
 
@@ -228,8 +248,9 @@ public class Video extends AppCompatActivity {
             @Override
             public void onGoAnother(Live one) {
                 live = one;
-                differentRes = getDiffRes(one.getUrllist());
-                liveUrl = differentRes.get(0);
+                genUrls();
+                if(urlIndex == -1) finish();
+                liveUrl = urlList.get(urlIndex);
                 videoController.setFavorite(live.getIsFavorite());
                 name = getName(liveUrl);
 
@@ -266,7 +287,7 @@ public class Video extends AppCompatActivity {
     }
 
     private String getName(String url) {
-        String short_url = url.substring(26, liveUrl.length() - 5);
+        String short_url = url.substring(26, url.length()-5);
         String[] temp = short_url.split("/");
         return temp[temp.length - 1];
     }
@@ -337,6 +358,7 @@ public class Video extends AppCompatActivity {
     private static final String TAG = "Video";
 
     public void playTv(String url) {
+        updateResPos();
         Uri uri = Uri.parse(url);
         videoController.ProgressBarVisible();
         video.setVideoURI(uri);
@@ -638,6 +660,52 @@ public class Video extends AppCompatActivity {
                 // This page is way off-screen to the right.
                 view.setAlpha(0);
             }
+        }
+    }
+
+
+    HashMap<String,String> diffRes;
+    ArrayList<Button> buttons;
+    private void genUrls(){
+        urlList = new ArrayList<>();
+        diffRes = new HashMap<>();
+        layoutSources.removeAllViews();
+        buttons = new ArrayList<>();
+        if(live.getUrllist() != null){
+            urlIndex = 0;
+            urlList = new ArrayList<>(Arrays.asList(live.getUrllist().split("#")));
+            for(String i:urlList){
+                String name = getName(i);
+                diffRes.put(name,i);
+                Button btn = new Button(getApplicationContext());
+                btn.setText(name);
+                btn.setWidth(MATCH_PARENT);
+                btn.setHeight(50);
+                btn.setTextSize(30);
+                btn.setTextColor(Color.parseColor("#80000000"));
+                btn.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                buttons.add(btn);
+                layoutSources.addView(btn);
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        urlIndex = buttons.indexOf(v);
+                        playTv(diffRes.get(((Button)v).getText()));
+                        layoutSetting.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        }else{
+            urlIndex = -1;
+        }
+    }
+
+    private void updateResPos(){
+        for (Button i:buttons){
+            i.setBackgroundColor(Color.parseColor("#f0f0f0"));
+        }
+        if(urlIndex < buttons.size()){
+            buttons.get(urlIndex).setBackgroundColor(Color.parseColor("#d0d0d0"));
         }
     }
 

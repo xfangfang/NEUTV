@@ -89,5 +89,44 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/layout_setting"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/cardview_light_background"
+        android:orientation="vertical">
+
+        <TextView
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:clickable="true"
+            android:onClick="fillWidth"
+            android:text="横向全屏"/>
+
+        <TextView
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:clickable="true"
+            android:onClick="fillHeight"
+            android:text="纵向适应"/>
+
+        <LinearLayout
+            android:id="@+id/layout_sources"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </LinearLayout>
+
 
 </RelativeLayout>
