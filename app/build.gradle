@@ -8,10 +8,8 @@ android {
         applicationId "com.lalala.fangs.neutv"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        renderscriptTargetApi 23
-        renderscriptSupportModeEnabled true
+        versionCode 3
+        versionName "2.1"
     }
     buildTypes {
         release {
@@ -19,7 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {

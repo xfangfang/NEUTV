@@ -383,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager = (ViewPager) findViewById(R.id.container);
                 mViewPager.setAdapter(mSectionsPagerAdapter);
 
-                mViewPager.setOffscreenPageLimit(2);
+//                mViewPager.setOffscreenPageLimit(2);
                 //将收藏放在-1屏
                 mViewPager.setCurrentItem(1);
 
