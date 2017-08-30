@@ -278,6 +278,7 @@ public class Video extends AppCompatActivity {
         tabLayout_show.setupWithViewPager(viewPager_show);
         viewPager_show.setPageTransformer(true, new ZoomOutPageTransformer());
 
+        videoController.setActivity(this);
     }
 
 
@@ -360,6 +361,7 @@ public class Video extends AppCompatActivity {
     public void playTv(String url) {
         updateResPos();
         Uri uri = Uri.parse(url);
+        videoController.contentVisible();
         videoController.ProgressBarVisible();
         video.setVideoURI(uri);
         video.start();
@@ -698,6 +700,14 @@ public class Video extends AppCompatActivity {
         }else{
             urlIndex = -1;
         }
+    }
+
+    public void fillWidth(View view){
+
+    }
+
+    public void fillHeight(View view){
+
     }
 
     private void updateResPos(){

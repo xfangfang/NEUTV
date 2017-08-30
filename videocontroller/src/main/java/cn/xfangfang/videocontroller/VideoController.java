@@ -1,13 +1,18 @@
 package cn.xfangfang.videocontroller;
 
+import android.app.Activity;
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -17,10 +22,14 @@ import android.widget.VideoView;
 
 import java.text.DecimalFormat;
 
+import static android.media.AudioManager.FLAG_SHOW_UI;
+import static android.media.AudioManager.STREAM_MUSIC;
+import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL;
+
 /**
  * TODO: document your custom view class.
  */
-public class VideoController extends FrameLayout{
+public class VideoController extends RelativeLayout{
 
     public VideoController(Context context) {
         super(context);
@@ -44,8 +53,11 @@ public class VideoController extends FrameLayout{
     SeekBar seekBar;
     ProgressBar progressBar;
     RelativeLayout contentLayout;
-    FrameLayout baseLayout;
+    RelativeLayout baseLayout;
     VideoView videoView;
+    private TextView textValume;
+    private Context context;
+    private Activity activity;
 
     private boolean isLive = false;
     private int autoGoneTime;
@@ -53,6 +65,7 @@ public class VideoController extends FrameLayout{
     private Handler handler_seekBar = new Handler();//每个一秒取一次当前播放时间
 
     private void init(final Context context, AttributeSet attrs, int defStyle) {
+        this.context = context;
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.controller_layout, this);
@@ -72,7 +85,8 @@ public class VideoController extends FrameLayout{
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 
         contentLayout = (RelativeLayout) view.findViewById(R.id.content);
-        baseLayout = (FrameLayout) view.findViewById(R.id.base_layout);
+        baseLayout = (RelativeLayout) view.findViewById(R.id.base_layout);
+        textValume = (TextView) view.findViewById(R.id.text_valume);
 
 
         listenerEvent();
@@ -81,6 +95,10 @@ public class VideoController extends FrameLayout{
         contentVisible();
         handler_seekBar.post(run_time);
 
+        setScreenMode(SCREEN_BRIGHTNESS_MODE_MANUAL);
+        liangdu =  Settings.System.getInt(context.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS, 8);
+        liangdu /= LEVEL;
     }
 
     @Override
@@ -216,6 +234,64 @@ public class VideoController extends FrameLayout{
 
     }
 
+    float startX,startY;
+    int liangdu = 1;
+    final int MAX = 19;
+    final int LEVEL = 15;
+    float addition=0;
+    float volumeAddition = 0;
+    float volume = 1;
+    float volumeMax;
+
+
+    private void setScreenMode(int paramInt) {
+        try {
+            Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, paramInt);
+        } catch (Exception localException) {
+            localException.printStackTrace();
+        }
+    }
+
+    private void setVolume(float param){
+        Log.e(TAG, "setVolume: ----"+param);
+        AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int f;
+        if(param < 4){
+            f = (int) (param / 16 / 2 * volumeMax);
+        }else {
+            param-=2;
+            f = (int) (param / 16  * volumeMax);
+        }
+        Log.e(TAG, "setVolume: "+f );
+        mAudioManager.setStreamVolume(STREAM_MUSIC,f,FLAG_SHOW_UI);
+    }
+
+    private void setScreenBrightness(int paramInt) {
+        if(activity == null) return;
+        Window localWindow = activity.getWindow();
+        WindowManager.LayoutParams localLayoutParams = localWindow.getAttributes();
+        double f = (paramInt*1.0) / (LEVEL*1.0);
+        localLayoutParams.screenBrightness = (float) f;
+        localWindow.setAttributes(localLayoutParams);
+    }
+
+    public void setActivity(Activity a){
+        activity = a;
+    }
+
+    private void getVolume(){
+        AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        volumeMax = mAudioManager.getStreamMaxVolume( STREAM_MUSIC );
+        volume = mAudioManager.getStreamVolume( STREAM_MUSIC );
+        volume = volume / volumeMax * 16;
+        if(volume < 2){
+            volume = (int) (2*volume);
+        }else{
+            volume = (int) volume + 2;
+        }
+        Log.e(TAG, "getVolume: "+volume );
+    }
+
     private void listenerEvent() {
         baseLayout.setOnClickListener(new OnClickListener() {
             @Override
@@ -225,6 +301,68 @@ public class VideoController extends FrameLayout{
                 }else{
                     contentVisible();
                 }
+            }
+        });
+
+        baseLayout.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int screenWidth;
+                int screenHeight;
+                if(videoView!=null) {
+                    screenWidth = videoView.getWidth();
+                    screenHeight = videoView.getHeight();
+                }else return false;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        addition = 0;
+                        volumeAddition = 0;
+                        getVolume();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float endY = event.getY();
+                        float distanceY = startY - endY;
+                        if (startX > screenWidth / 2) {
+                            //右侧 音量
+                            if (Math.abs(distanceY) > 0.5) {
+                                volumeAddition = ((distanceY/screenHeight)*MAX);
+                                if(volume + volumeAddition >= MAX-1) {
+                                    volumeAddition = MAX - 1 - volume;
+                                }
+                                else if(volume + volumeAddition < 0){
+                                    volumeAddition = -volume;
+                                }
+                                int text = (int)volume+(int)volumeAddition;
+                                if(text < 4 )
+                                    textValume.setText(String.valueOf(text*0.25));
+                                else
+                                    textValume.setText(String.valueOf(text-3));
+
+                                setVolume(volume+volumeAddition);
+                            }
+                        } else {
+                            //左侧 亮度
+                            if (Math.abs(distanceY) > 0.5) {
+                                addition = ((distanceY/screenHeight)*LEVEL);
+                                if(liangdu + addition >= LEVEL) addition = LEVEL-liangdu;
+                                else if(liangdu + addition < 1) addition = -liangdu + 1;
+                                textValume.setText(""+(liangdu+(int)addition));
+                                setScreenBrightness(liangdu+(int)addition);
+                            }
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if(Math.abs(startX - event.getX()) < 30 && Math.abs(startY - event.getY()) < 30){
+                            return false;
+                        }else{
+                            liangdu += (int) addition;
+                            volume += (int) volumeAddition;
+                            return true;
+                        }
+                }
+                return false;
             }
         });
 

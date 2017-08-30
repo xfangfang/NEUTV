@@ -31,101 +31,110 @@
         android:id="@+id/list_layout_before"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:visibility="invisible"
-        android:orientation="horizontal">
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:visibility="invisible">
 
         <q.rorbin.verticaltablayout.VerticalTabLayout
             android:id="@+id/tablayout_before_list"
             android:layout_width="70dp"
             android:layout_height="match_parent"
+            android:background="#EDEDED"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:background="#EDEDED"
             app:indicator_color="#FFFFFF"
             app:indicator_corners="4dp"
-            app:tab_margin="10dp"
             app:indicator_gravity="fill"
-            app:tab_mode="scrollable"
+            app:tabSelectedTextColor="#FEFEFE"
             app:tabTextColor="#80FEFEFE"
-            app:tabSelectedTextColor="#FEFEFE"/>
+            app:tab_margin="10dp"
+            app:tab_mode="scrollable" />
 
         <android.support.v4.view.ViewPager
-            android:background="@color/cardview_light_background"
             android:id="@+id/view_pager_before_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/cardview_light_background" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/list_layout_show"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:visibility="invisible"
-        android:orientation="horizontal">
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:visibility="invisible">
 
         <q.rorbin.verticaltablayout.VerticalTabLayout
             android:id="@+id/tablayout_show"
             android:layout_width="70dp"
             android:layout_height="match_parent"
+            android:background="#EDEDED"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:background="#EDEDED"
             app:indicator_color="#FFFFFF"
             app:indicator_corners="4dp"
-            app:tab_margin="10dp"
             app:indicator_gravity="fill"
-            app:tab_mode="scrollable"
+            app:tabSelectedTextColor="#FEFEFE"
             app:tabTextColor="#80FEFEFE"
-            app:tabSelectedTextColor="#FEFEFE"/>
+            app:tab_margin="10dp"
+            app:tab_mode="scrollable" />
 
         <android.support.v4.view.ViewPager
-            android:background="@color/cardview_light_background"
             android:id="@+id/view_pager_show"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/cardview_light_background" />
     </LinearLayout>
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/layout_setting"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:background="@color/cardview_light_background"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
-            android:textSize="30sp"
             android:clickable="true"
+            android:gravity="center"
             android:onClick="fillWidth"
-            android:text="横向全屏"/>
+            android:text="横向全屏"
+            android:textSize="30sp" />
 
         <TextView
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
-            android:textSize="30sp"
             android:clickable="true"
+            android:gravity="center"
             android:onClick="fillHeight"
-            android:text="纵向适应"/>
+            android:text="纵向适应"
+            android:textSize="30sp" />
 
-        <LinearLayout
-            android:id="@+id/layout_sources"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="32dp"
+            android:text="换源" />
 
-        </LinearLayout>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/layout_sources"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+            </LinearLayout>
+        </ScrollView>
+
     </LinearLayout>
 
 
