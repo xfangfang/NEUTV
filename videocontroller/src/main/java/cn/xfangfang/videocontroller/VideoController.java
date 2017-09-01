@@ -58,6 +58,7 @@ public class VideoController extends RelativeLayout{
     private Context context;
     private Activity activity;
 
+    private int currentTime;
     private boolean isLive = false;
     private int autoGoneTime;
     private Handler handler_autoGone = new Handler();
@@ -140,11 +141,14 @@ public class VideoController extends RelativeLayout{
 
     private Runnable run_time = new Runnable() {
         public void run() {
-            long a = videoView.getCurrentPosition();
+            int a = videoView.getCurrentPosition();
             if(!isLive) {
-                txv_start_time.setText(intToString((int) a / 1000));
+                txv_start_time.setText(intToString(a / 1000));
+                if(a != 0) {
+                    currentTime = a;
+                }
             }
-            seekBar.setProgress((int) a / 1000);
+            seekBar.setProgress(a / 1000);
             handler_seekBar.postDelayed(run_time, 1000);
         }
     };
@@ -183,6 +187,7 @@ public class VideoController extends RelativeLayout{
             @Override
             public void onPrepared(MediaPlayer mp) {
                 Log.e(TAG, "onPrepared: 准备好啦" );
+                Log.e(TAG, "onPrepared: "+currentTime );
                 long a = videoView.getDuration();
                 reSetAutoGoneTime();
                 progressBar.setVisibility(INVISIBLE);
@@ -191,6 +196,7 @@ public class VideoController extends RelativeLayout{
                 if(stateListener != null){
                     stateListener.onPrepared();
                 }
+                videoView.seekTo(currentTime-5000);
             }
         });
 
@@ -517,15 +523,22 @@ public class VideoController extends RelativeLayout{
         void onInvisible();
     }
 
+    public interface OnTimeListener{
+        void onTimeChange(long currentTime);
+    }
 
     private OnStateListener stateListener;
     private OnClickEventListener clickEventListener;
+    private OnTimeListener timeListener;
 
     public void setOnStateListener(OnStateListener listener){
         this.stateListener = listener;
     }
     public void setOnClickEventListener(OnClickEventListener listener){
         this.clickEventListener = listener;
+    }
+    public void setOnTimeListener(OnTimeListener listener){
+        this.timeListener = listener;
     }
 
     private int dp2px(float dp) {

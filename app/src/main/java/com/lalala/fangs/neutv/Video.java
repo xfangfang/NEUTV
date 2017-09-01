@@ -77,6 +77,7 @@ public class Video extends AppCompatActivity {
     ArrayList<String> urlList;
     String liveUrl;
     int urlIndex;
+    long currentTime = 0;
 
     String name; //传递过来的节目名字
     Live live;
@@ -89,9 +90,6 @@ public class Video extends AppCompatActivity {
     PagerAdapter pagerAdapter;
     private TextView textFillWidth;
     private TextView textFillHeight;
-
-
-
     private LinearLayout layoutSources;
     private LinearLayout videoContent;
     private LinearLayout layoutSetting;
@@ -111,7 +109,6 @@ public class Video extends AppCompatActivity {
             getWindow().setNavigationBarColor(Color.TRANSPARENT);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-
 
         video = (VideoView) findViewById(videoView);
         videoController = (VideoController) findViewById(R.id.video_controller);
@@ -241,6 +238,12 @@ public class Video extends AppCompatActivity {
             @Override
             public void onInvisible() {
                 videoController.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+            }
+        });
+        videoController.setOnTimeListener(new VideoController.OnTimeListener() {
+            @Override
+            public void onTimeChange(long time) {
+                currentTime = time;
             }
         });
 
