@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
@@ -43,8 +45,11 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.text.Collator;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,7 +161,7 @@ public class Video extends AppCompatActivity {
 
             @Override
             public void onMenu() {
-                layoutSetting.setVisibility(View.VISIBLE);
+                showSettingLayout();
             }
 
             @Override
@@ -229,7 +234,7 @@ public class Video extends AppCompatActivity {
                     linearLayout_show.setVisibility(View.INVISIBLE);
                 }
                 if(layoutSetting.isShown()){
-                    layoutSetting.setVisibility(View.INVISIBLE);
+                    hideSettingLayout();
                 }
             }
 
@@ -337,7 +342,7 @@ public class Video extends AppCompatActivity {
             linearLayout_show.setVisibility(View.INVISIBLE);
             return;
         }else if(layoutSetting.isShown()){
-            layoutSetting.setVisibility(View.INVISIBLE);
+            hideSettingLayout();
             return;
         }
         else if (videoController.isShown()) {
@@ -394,7 +399,10 @@ public class Video extends AppCompatActivity {
         protected Boolean doInBackground(String... params) {
             String updateUrl = "http://hdtv.neu6.edu.cn/" + params[0] + ".review";
             OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(updateUrl).build();
+            Request request = new Request.Builder()
+                    .url(updateUrl)
+                    .addHeader("user-agent","neutv"+getVersion())
+                    .build();
             okhttp3.Response response;
             try {
                 response = client.newCall(request).execute();
@@ -641,8 +649,18 @@ public class Video extends AppCompatActivity {
 
         @Override
         public ITabView.TabTitle getTitle(int position) {
+            if(getWeek(titles.get(position)) == null){
+                return new TabView.TabTitle.Builder()
+                        .setContent(
+                                titles.get(position).substring(titleBegin, titles.get(position).length()))
+                        .setTextColor(0xFF36BC9B, 0xFFFFFFFF)
+                        .build();
+            }
             return new TabView.TabTitle.Builder()
-                    .setContent(titles.get(position).substring(titleBegin, titles.get(position).length()))
+                    .setContent(
+                            titles.get(position).substring(titleBegin, titles.get(position).length())+
+                            "\n"+
+                            getWeek(titles.get(position)))
                     .setTextColor(0xFF36BC9B, 0xFFFFFFFF)
                     .build();
         }
@@ -733,7 +751,7 @@ public class Video extends AppCompatActivity {
                     public void onClick(View v) {
                         urlIndex = buttons.indexOf(v);
                         playTv(diffRes.get(((Button)v).getText()));
-                        layoutSetting.setVisibility(View.INVISIBLE);
+                        hideSettingLayout();
                     }
                 });
             }
@@ -748,7 +766,7 @@ public class Video extends AppCompatActivity {
         video.setLayoutParams(layoutParams);
         view.setBackgroundColor(Color.parseColor("#80000000"));
         textFillHeight.setBackgroundColor(Color.parseColor("#00000000"));
-        layoutSetting.setVisibility(View.INVISIBLE);
+        hideSettingLayout();
     }
 
     public void fillHeight(View view){
@@ -757,7 +775,7 @@ public class Video extends AppCompatActivity {
         video.setLayoutParams(layoutParams);
         view.setBackgroundColor(Color.parseColor("#80000000"));
         textFillWidth.setBackgroundColor(Color.parseColor("#00000000"));
-        layoutSetting.setVisibility(View.INVISIBLE);
+        hideSettingLayout();
     }
 
     private void updateResPos(){
@@ -777,5 +795,126 @@ public class Video extends AppCompatActivity {
     private int dp2px(float dp) {
         float scale = getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
+    }
+
+    private void hideSettingLayout(){
+//        Animator.AnimatorListener listener = null;
+//        listener = new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+                layoutSetting.setVisibility(View.INVISIBLE);
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        };
+//        AnimatorSet set = new AnimatorSet();
+//        ObjectAnimator anim1 = ObjectAnimator.ofFloat(layoutSetting, "translationX",  0f,dp2px( 300));
+//
+//
+//        anim1.setInterpolator(new AccelerateInterpolator());
+//
+//        anim1.setDuration(200);
+//        set.play(anim1);
+//        set.start();
+//        set.addListener(listener);
+    }
+
+    private void showSettingLayout(){
+        layoutSetting.setVisibility(View.VISIBLE);
+
+//        Animator.AnimatorListener listener = null;
+//        listener = new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//                layoutSetting.setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        };
+//        AnimatorSet set = new AnimatorSet();
+//        ObjectAnimator anim1 = ObjectAnimator.ofFloat(layoutSetting, "translationX", 0f, 0f);
+//
+//
+//        anim1.setInterpolator(new AccelerateInterpolator());
+//
+//        anim1.setDuration(200);
+//        set.play(anim1);
+//        set.start();
+//        set.addListener(listener);
+    }
+
+    private String getWeek(String pTime) {
+        String Week = "";
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(format.parse(pTime));
+        } catch (ParseException e) {
+            return null;
+        }
+        switch (c.get(Calendar.DAY_OF_WEEK)){
+            case Calendar.SUNDAY:
+                Week = "周日";
+                break;
+            case Calendar.MONDAY:
+                Week = "周一";
+                break;
+            case Calendar.TUESDAY:
+                Week = "周二";
+                break;
+            case Calendar.WEDNESDAY:
+                Week = "周三";
+                break;
+            case Calendar.THURSDAY:
+                Week = "周四";
+                break;
+            case Calendar.FRIDAY:
+                Week = "周五";
+                break;
+            case Calendar.SATURDAY:
+                Week = "周六";
+                break;
+        }
+        return Week;
+    }
+
+    /**
+     * 获取版本号
+     * @return 当前应用的版本号
+     */
+    public String getVersion() {
+        try {
+            PackageManager manager = this.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "null";
+        }
     }
 }

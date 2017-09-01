@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -323,7 +325,11 @@ public class MainActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... params) {
             String updateUrl = "http://hdtv.neu6.edu.cn/hdtv.json";
             OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(updateUrl).build();
+            Request request = new Request
+                    .Builder()
+                    .url(updateUrl)
+                    .addHeader("user-agent","neutv"+getVersion())
+                    .build();
             okhttp3.Response response;
             //每次取节目单前先清除磁盘缓存
             Glide.get(getContext()).clearDiskCache();
@@ -425,5 +431,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 获取版本号
+     * @return 当前应用的版本号
+     */
+    public String getVersion() {
+        try {
+            PackageManager manager = this.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "null";
+        }
     }
 }
