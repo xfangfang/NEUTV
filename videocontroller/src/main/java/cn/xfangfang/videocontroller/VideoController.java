@@ -55,7 +55,6 @@ public class VideoController extends RelativeLayout{
     RelativeLayout contentLayout;
     RelativeLayout baseLayout;
     VideoView videoView;
-    private TextView textValume;
     private Context context;
     private Activity activity;
 
@@ -86,7 +85,6 @@ public class VideoController extends RelativeLayout{
 
         contentLayout = (RelativeLayout) view.findViewById(R.id.content);
         baseLayout = (RelativeLayout) view.findViewById(R.id.base_layout);
-        textValume = (TextView) view.findViewById(R.id.text_valume);
 
 
         listenerEvent();
@@ -253,7 +251,6 @@ public class VideoController extends RelativeLayout{
     }
 
     private void setVolume(float param){
-        Log.e(TAG, "setVolume: ----"+param);
         AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int f;
         if(param < 4){
@@ -262,7 +259,6 @@ public class VideoController extends RelativeLayout{
             param-=2;
             f = (int) (param / 16  * volumeMax);
         }
-        Log.e(TAG, "setVolume: "+f );
         mAudioManager.setStreamVolume(STREAM_MUSIC,f,FLAG_SHOW_UI);
     }
 
@@ -289,7 +285,6 @@ public class VideoController extends RelativeLayout{
         }else{
             volume = (int) volume + 2;
         }
-        Log.e(TAG, "getVolume: "+volume );
     }
 
     private void listenerEvent() {
@@ -309,6 +304,7 @@ public class VideoController extends RelativeLayout{
             public boolean onTouch(View v, MotionEvent event) {
                 int screenWidth;
                 int screenHeight;
+                int maxCap = dp2px(10);
                 if(videoView!=null) {
                     screenWidth = videoView.getWidth();
                     screenHeight = videoView.getHeight();
@@ -326,7 +322,7 @@ public class VideoController extends RelativeLayout{
                         float distanceY = startY - endY;
                         if (startX > screenWidth / 2) {
                             //右侧 音量
-                            if (Math.abs(distanceY) > 0.5) {
+                            if (Math.abs(distanceY) > maxCap) {
                                 volumeAddition = ((distanceY/screenHeight)*MAX);
                                 if(volume + volumeAddition >= MAX-1) {
                                     volumeAddition = MAX - 1 - volume;
@@ -335,26 +331,25 @@ public class VideoController extends RelativeLayout{
                                     volumeAddition = -volume;
                                 }
                                 int text = (int)volume+(int)volumeAddition;
-                                if(text < 4 )
-                                    textValume.setText(String.valueOf(text*0.25));
-                                else
-                                    textValume.setText(String.valueOf(text-3));
+//                                if(text < 4 )
+//                                    textValume.setText(String.valueOf(text*0.25));
+//                                else
+//                                    textValume.setText(String.valueOf(text-3));
 
                                 setVolume(volume+volumeAddition);
                             }
                         } else {
                             //左侧 亮度
-                            if (Math.abs(distanceY) > 0.5) {
+                            if (Math.abs(distanceY) > maxCap) {
                                 addition = ((distanceY/screenHeight)*LEVEL);
                                 if(liangdu + addition >= LEVEL) addition = LEVEL-liangdu;
                                 else if(liangdu + addition < 1) addition = -liangdu + 1;
-                                textValume.setText(""+(liangdu+(int)addition));
                                 setScreenBrightness(liangdu+(int)addition);
                             }
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        if(Math.abs(startX - event.getX()) < 30 && Math.abs(startY - event.getY()) < 30){
+                        if(Math.abs(startX - event.getX()) < maxCap && Math.abs(startY - event.getY()) < maxCap){
                             return false;
                         }else{
                             liangdu += (int) addition;
@@ -533,5 +528,9 @@ public class VideoController extends RelativeLayout{
         this.clickEventListener = listener;
     }
 
+    private int dp2px(float dp) {
+        float scale = getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
 
 }

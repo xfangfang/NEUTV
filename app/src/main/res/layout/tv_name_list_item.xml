@@ -10,8 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="@android:color/white"
         tools:text="出彩中国人" />
 
 </LinearLayout>

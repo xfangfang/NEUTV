@@ -17,8 +17,8 @@
 
         <VideoView
             android:id="@+id/videoView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <cn.xfangfang.videocontroller.VideoController
@@ -40,14 +40,14 @@
             android:id="@+id/tablayout_before_list"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:background="#EDEDED"
+            android:background="#80000000"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             app:indicator_color="#FFFFFF"
             app:indicator_corners="4dp"
             app:indicator_gravity="fill"
             app:tabSelectedTextColor="#FEFEFE"
-            app:tabTextColor="#80FEFEFE"
+            app:tabTextColor="@android:color/white"
             app:tab_margin="10dp"
             app:tab_mode="scrollable" />
 
@@ -55,7 +55,7 @@
             android:id="@+id/view_pager_before_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/cardview_light_background" />
+            android:background="#60000000" />
     </LinearLayout>
 
     <LinearLayout
@@ -71,14 +71,12 @@
             android:id="@+id/tablayout_show"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:background="#EDEDED"
+            android:background="#80000000"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             app:indicator_color="#FFFFFF"
             app:indicator_corners="4dp"
             app:indicator_gravity="fill"
-            app:tabSelectedTextColor="#FEFEFE"
-            app:tabTextColor="#80FEFEFE"
             app:tab_margin="10dp"
             app:tab_mode="scrollable" />
 
@@ -86,7 +84,7 @@
             android:id="@+id/view_pager_show"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/cardview_light_background" />
+            android:background="#60000000" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,36 +93,67 @@
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="@color/cardview_light_background"
+        android:background="#80000000"
         android:orientation="vertical"
+        tools:visibility="visible"
         android:visibility="gone">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="32dp"
+            android:textSize="24sp"
+            android:paddingStart="32dp"
+            android:paddingLeft="32dp"
+            android:textColor="@android:color/white"
+            android:background="#a0000000"
+            android:text="屏幕调整" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#40000000"/>
+
+        <TextView
+            android:id="@+id/text_fillWidth"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
             android:clickable="true"
             android:gravity="center"
             android:onClick="fillWidth"
             android:text="横向全屏"
-            android:textSize="30sp" />
+            android:background="#80000000"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/text_fillHeight"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="48dp"
             android:clickable="true"
             android:gravity="center"
             android:onClick="fillHeight"
             android:text="纵向适应"
-            android:textSize="30sp" />
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="32dp"
-            android:text="换源" />
+            android:textSize="24sp"
+            android:background="#a0000000"
+            android:paddingStart="32dp"
+            android:paddingLeft="32dp"
+            android:textColor="@android:color/white"
+            android:text="直播换源" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#40000000"/>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false">
 
             <LinearLayout
                 android:id="@+id/layout_sources"

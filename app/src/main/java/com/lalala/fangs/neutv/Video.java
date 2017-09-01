@@ -30,6 +30,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -53,6 +55,9 @@ import cn.xfangfang.videocontroller.VideoController;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import q.rorbin.verticaltablayout.VerticalTabLayout;
+import q.rorbin.verticaltablayout.adapter.TabAdapter;
+import q.rorbin.verticaltablayout.widget.ITabView;
+import q.rorbin.verticaltablayout.widget.TabView;
 
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -77,6 +82,11 @@ public class Video extends AppCompatActivity {
     ViewPager viewPager_before, viewPager_show;
     VerticalTabLayout tabLayout_before, tabLayout_show;
     PagerAdapter pagerAdapter;
+    private TextView textFillWidth;
+    private TextView textFillHeight;
+
+
+
     private LinearLayout layoutSources;
     private LinearLayout videoContent;
     private LinearLayout layoutSetting;
@@ -104,6 +114,8 @@ public class Video extends AppCompatActivity {
         linearLayout_show = (LinearLayout) findViewById(R.id.list_layout_show);
         videoContent = (LinearLayout) findViewById(R.id.video_content);
         layoutSetting = (LinearLayout) findViewById(R.id.layout_setting);
+        textFillWidth = (TextView) findViewById(R.id.text_fillWidth);
+        textFillHeight = (TextView) findViewById(R.id.text_fillHeight);
 
 
         viewPager_before = (ViewPager) findViewById(R.id.view_pager_before_list);
@@ -159,16 +171,17 @@ public class Video extends AppCompatActivity {
 
             @Override
             public void onFavorite() {
-                Toast.makeText(getApplicationContext(), "喜欢", Toast.LENGTH_LONG).show();
                 ContentValues values = new ContentValues();
                 Intent intent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
 
                 if (live.getIsFavorite()) {
                     live.setIsFavorite(false);
                     values.put("isFavorite", "0");
+                    Toast.makeText(getApplicationContext(), "不喜欢了", Toast.LENGTH_LONG).show();
                 } else {
                     live.setIsFavorite(true);
                     values.put("isFavorite", "1");
+                    Toast.makeText(getApplicationContext(), "喜欢", Toast.LENGTH_LONG).show();
                 }
                 videoController.setFavorite(live.getIsFavorite());
                 //更新数据库
@@ -323,7 +336,11 @@ public class Video extends AppCompatActivity {
         } else if (linearLayout_show.isShown()) {
             linearLayout_show.setVisibility(View.INVISIBLE);
             return;
-        } else if (videoController.isShown()) {
+        }else if(layoutSetting.isShown()){
+            layoutSetting.setVisibility(View.INVISIBLE);
+            return;
+        }
+        else if (videoController.isShown()) {
 //            videoController.contentInvisible();
 //            return;
         }
@@ -582,7 +599,7 @@ public class Video extends AppCompatActivity {
 
     }
 
-    private class PagerAdapter extends FragmentStatePagerAdapter {
+    private class PagerAdapter extends FragmentStatePagerAdapter implements TabAdapter {
         private ArrayList<Fragment> datas;
         private ArrayList<String> titles;
         int titleBegin = 0;
@@ -610,6 +627,29 @@ public class Video extends AppCompatActivity {
         @Override
         public int getCount() {
             return datas == null ? 0 : datas.size();
+        }
+
+        @Override
+        public ITabView.TabBadge getBadge(int position) {
+            return null;
+        }
+
+        @Override
+        public ITabView.TabIcon getIcon(int position) {
+            return null;
+        }
+
+        @Override
+        public ITabView.TabTitle getTitle(int position) {
+            return new TabView.TabTitle.Builder()
+                    .setContent(titles.get(position).substring(titleBegin, titles.get(position).length()))
+                    .setTextColor(0xFF36BC9B, 0xFFFFFFFF)
+                    .build();
+        }
+
+        @Override
+        public int getBackground(int position) {
+            return 0;
         }
 
         @Override
@@ -682,10 +722,10 @@ public class Video extends AppCompatActivity {
                 Button btn = new Button(getApplicationContext());
                 btn.setText(name);
                 btn.setWidth(MATCH_PARENT);
-                btn.setHeight(50);
-                btn.setTextSize(30);
-                btn.setTextColor(Color.parseColor("#80000000"));
-                btn.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                btn.setHeight(dp2px(48));
+                btn.setTextSize(18);
+                btn.setTextColor(Color.parseColor("#FFFFFF"));
+                btn.setBackgroundColor(Color.parseColor("#00ffffff"));
                 buttons.add(btn);
                 layoutSources.addView(btn);
                 btn.setOnClickListener(new View.OnClickListener() {
@@ -703,20 +743,39 @@ public class Video extends AppCompatActivity {
     }
 
     public void fillWidth(View view){
-
+        LinearLayout.LayoutParams layoutParams=
+                new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        video.setLayoutParams(layoutParams);
+        view.setBackgroundColor(Color.parseColor("#80000000"));
+        textFillHeight.setBackgroundColor(Color.parseColor("#00000000"));
+        layoutSetting.setVisibility(View.INVISIBLE);
     }
 
     public void fillHeight(View view){
-
+        LinearLayout.LayoutParams layoutParams=
+                new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        video.setLayoutParams(layoutParams);
+        view.setBackgroundColor(Color.parseColor("#80000000"));
+        textFillWidth.setBackgroundColor(Color.parseColor("#00000000"));
+        layoutSetting.setVisibility(View.INVISIBLE);
     }
 
     private void updateResPos(){
         for (Button i:buttons){
-            i.setBackgroundColor(Color.parseColor("#f0f0f0"));
+            i.setBackgroundColor(Color.parseColor("#00ffffff"));
         }
         if(urlIndex < buttons.size()){
-            buttons.get(urlIndex).setBackgroundColor(Color.parseColor("#d0d0d0"));
+            buttons.get(urlIndex).setBackgroundColor(Color.parseColor("#80000000"));
         }
     }
 
+    private int px2dp(float px){
+        float scale = getResources().getDisplayMetrics().density;
+        return (int) (px / scale + 0.5f);
+    }
+
+    private int dp2px(float dp) {
+        float scale = getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
 }
