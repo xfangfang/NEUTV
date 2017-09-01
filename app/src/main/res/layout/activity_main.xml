@@ -67,11 +67,11 @@
         </android.support.design.widget.AppBarLayout>
 
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/container"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/container"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     </android.support.design.widget.CoordinatorLayout>
@@ -82,4 +82,25 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 
+    <TextView
+        android:id="@+id/text_wrong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="网络有点问题"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+    <Button
+        android:visibility="invisible"
+        android:id="@+id/btn_wrong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点击重试"
+        android:onClick="reCall"
+        android:layout_below="@+id/text_wrong"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp" />
 </RelativeLayout>

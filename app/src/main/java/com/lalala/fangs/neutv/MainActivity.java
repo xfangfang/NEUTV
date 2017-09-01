@@ -25,8 +25,9 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private TabStrip tabStrip;
     private ProgressBar progressBar;
+    private TextView textWrong;
+    private Button btnWrong;
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
 
@@ -68,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        textWrong = (TextView) findViewById(R.id.text_wrong);
+        btnWrong = (Button) findViewById(R.id.btn_wrong);
         new getUpdateLive().execute();
 
     }
@@ -395,13 +400,21 @@ public class MainActivity extends AppCompatActivity {
 
                 tabStrip = (TabStrip) findViewById(R.id.tabstrip);
                 tabStrip.setViewPager(mViewPager);
+                textWrong.setVisibility(View.INVISIBLE);
+                btnWrong.setVisibility(View.INVISIBLE);
             } else {
-                Toast.makeText(getContext(), "出了点问题，需要检查网络，并重启app", Toast.LENGTH_LONG).show();
-                Log.e(TAG, "onPostExecute: 出了点问题");
+                textWrong.setVisibility(View.VISIBLE);
+                btnWrong.setVisibility(View.VISIBLE);
+                btnWrong.setClickable(true);
             }
             progressBar.setVisibility(View.INVISIBLE);
 
         }
+    }
+
+    public void reCall(View v){
+        v.setClickable(false);
+        new getUpdateLive().execute();
     }
 
     private static final String TAG = "MainActivity";
