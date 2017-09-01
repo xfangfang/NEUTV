@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnWrong;
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
+    private int loginTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,27 @@ public class MainActivity extends AppCompatActivity {
         btnWrong = (Button) findViewById(R.id.btn_wrong);
         new getUpdateLive().execute();
 
+        SharedPreferences sp = getSharedPreferences("APPCONFIG", Context.MODE_PRIVATE);
+        loginTime = sp.getInt("loginTime", 0);
+        if(loginTime < 5){
+            AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
+            ab.setPositiveButton("神奇的功能 点击加群!", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    joinQQGroup("OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA");
+                }
+            });
+            ab.setTitle("一共只提醒你三次哦");
+            ab.setMessage("\n校园内使用，断开校园网账号，不然流量哗哗的～\n\n" +
+                    "欢迎加群\n532607431\n向作者吐槽");
+            AlertDialog dialog = ab.create();
+            dialog.show();
+
+        }
+        SharedPreferences.Editor spEdit = getSharedPreferences("APPCONFIG", Context.MODE_PRIVATE).edit();
+        loginTime++;
+        spEdit.putInt("loginTime", loginTime);
+        spEdit.apply();
     }
 
     @Override
@@ -458,6 +483,28 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             return "null";
+        }
+    }
+
+
+    /****************
+     *
+     * 发起添加群流程。群号：直视 官方BUG反馈(532607431) 的 key 为： OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA
+     * 调用 joinQQGroup(OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA) 即可发起手Q客户端申请加群 直视 官方BUG反馈(532607431)
+     *
+     * @param key 由官网生成的key
+     * @return 返回true表示呼起手Q成功，返回fals表示呼起失败
+     ******************/
+    private boolean joinQQGroup(String key) {
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key));
+        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            // 未安装手Q或安装的版本不支持
+            return false;
         }
     }
 }

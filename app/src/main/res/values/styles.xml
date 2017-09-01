@@ -6,6 +6,7 @@
         <item name="colorPrimary">#ffffff</item>
         <item name="colorPrimaryDark">#aaaaaa</item>
         <item name="colorAccent">#dddddd</item>
+        <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
     </style>
 
     <style name="AppTheme.NoActionBar" >
@@ -13,6 +14,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
     </style>
 
     <style name="TabText" parent="TextAppearance.AppCompat">
