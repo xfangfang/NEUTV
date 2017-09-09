@@ -543,4 +543,14 @@ public class VideoController extends RelativeLayout{
         return (int) (dp * scale + 0.5f);
     }
 
+    public void setBeforeBtnClickable(boolean isClickable){
+        this.ib_list_before.setClickable(isClickable);
+
+        if(isClickable){
+            this.ib_list_before.setVisibility(VISIBLE);
+        }else{
+            this.ib_list_before.setVisibility(INVISIBLE);
+        }
+    }
+
 }

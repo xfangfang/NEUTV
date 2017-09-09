@@ -436,6 +436,7 @@ public class Video extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
+            videoController.setBeforeBtnClickable(aBoolean);
             if (aBoolean) {
                 pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 5);
                 ArrayList<Fragment> datas = new ArrayList<>();
@@ -448,8 +449,9 @@ public class Video extends AppCompatActivity {
                 tabLayout_before.setupWithViewPager(viewPager_before);
                 viewPager_before.setPageTransformer(true, new ZoomOutPageTransformer());
                 pagerAdapter.notifyDataSetChanged();
-            } else {
-                //没有取得历史节目单
+            }else{
+                pagerAdapter.setData(null,null);
+                pagerAdapter.notifyDataSetChanged();
             }
         }
     }
