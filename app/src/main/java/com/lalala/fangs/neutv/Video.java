@@ -434,6 +434,7 @@ public class Video extends AppCompatActivity {
             return true;
         }
 
+
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             videoController.setBeforeBtnClickable(aBoolean);
