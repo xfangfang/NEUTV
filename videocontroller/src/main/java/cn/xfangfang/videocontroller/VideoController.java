@@ -7,7 +7,6 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,7 +57,6 @@ public class VideoController extends RelativeLayout{
     private Context context;
     private Activity activity;
 
-    private int currentTime;
     private boolean isLive = false;
     private int autoGoneTime;
     private Handler handler_autoGone = new Handler();
@@ -145,7 +143,9 @@ public class VideoController extends RelativeLayout{
             if(!isLive) {
                 txv_start_time.setText(intToString(a / 1000));
                 if(a != 0) {
-                    currentTime = a;
+                    if(timeListener != null){
+                        timeListener.onTimeChange(a);
+                    }
                 }
             }
             seekBar.setProgress(a / 1000);
@@ -186,8 +186,6 @@ public class VideoController extends RelativeLayout{
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                Log.e(TAG, "onPrepared: 准备好啦" );
-                Log.e(TAG, "onPrepared: "+currentTime );
                 long a = videoView.getDuration();
                 reSetAutoGoneTime();
                 progressBar.setVisibility(INVISIBLE);
@@ -196,7 +194,6 @@ public class VideoController extends RelativeLayout{
                 if(stateListener != null){
                     stateListener.onPrepared();
                 }
-                videoView.seekTo(currentTime-5000);
             }
         });
 
@@ -207,6 +204,7 @@ public class VideoController extends RelativeLayout{
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     txv_start_time.setText(intToString(progress));
+                    autoGoneTime = 0;
                     if (progress > a)
                         txv_centerTime.setText("+ " + intToString(progress - a));
                     else
@@ -235,7 +233,6 @@ public class VideoController extends RelativeLayout{
                 videoView.start();
             }
         });
-
     }
 
     float startX,startY;
@@ -524,7 +521,7 @@ public class VideoController extends RelativeLayout{
     }
 
     public interface OnTimeListener{
-        void onTimeChange(long currentTime);
+        void onTimeChange(int currentTime);
     }
 
     private OnStateListener stateListener;

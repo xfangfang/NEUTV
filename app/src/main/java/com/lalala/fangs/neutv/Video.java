@@ -77,7 +77,7 @@ public class Video extends AppCompatActivity {
     ArrayList<String> urlList;
     String liveUrl;
     int urlIndex;
-    long currentTime = 0;
+    int currentTime = 0;
 
     String name; //传递过来的节目名字
     Live live;
@@ -198,11 +198,11 @@ public class Video extends AppCompatActivity {
             public void onError() {
                 urlIndex++;
                 if(urlIndex < urlList.size()) {
-                    Toast.makeText(getApplicationContext(), "当前源不可用 正在自动切换", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "当当前资源不可用 正在自动切换直播源", Toast.LENGTH_LONG).show();
                     playTv(urlList.get(urlIndex));
                 }else{
                     Toast.makeText(getApplicationContext(), "资源出了点问题", Toast.LENGTH_LONG).show();
-                    finish();
+//                    finish();
                 }
             }
 
@@ -242,7 +242,7 @@ public class Video extends AppCompatActivity {
         });
         videoController.setOnTimeListener(new VideoController.OnTimeListener() {
             @Override
-            public void onTimeChange(long time) {
+            public void onTimeChange(int time) {
                 currentTime = time;
             }
         });
@@ -277,6 +277,7 @@ public class Video extends AppCompatActivity {
 
                 videoController.contentVisible();
                 playTv(one.getUrllist());
+                currentTime = 0;
                 new getLiveBefore().execute(name);
                 videoController.setTitle(one.getName());
                 linearLayout_show.setVisibility(View.INVISIBLE);
@@ -367,9 +368,13 @@ public class Video extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         videoController.contentVisible();
+        currentTime -= 5;
+        if(currentTime < 0) currentTime = 0;
         if(videoViewState){
+            video.seekTo(currentTime);
             videoController.start();
         }else{
+            video.seekTo(currentTime);
             videoController.pause();
         }
         super.onPostResume();
@@ -485,6 +490,7 @@ public class Video extends AppCompatActivity {
                     Log.e(TAG, "onItemClick: "+timeNow+"---"+timeStart );
                     if(timeNow > timeStart+60000) {
                         parentActivity.playTv(url);
+                        parentActivity.currentTime = 0;
                         parentActivity.videoController.setTitle(one.get(2));
                         parentActivity.videoController.contentVisible();
                         parentActivity.linearLayout_before.setVisibility(View.INVISIBLE);
@@ -754,6 +760,7 @@ public class Video extends AppCompatActivity {
                     public void onClick(View v) {
                         urlIndex = buttons.indexOf(v);
                         playTv(diffRes.get(((Button)v).getText()));
+                        videoController.setIsLiveOrNot(true);
                         hideSettingLayout();
                     }
                 });
