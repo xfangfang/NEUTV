@@ -438,22 +438,22 @@ public class Video extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             videoController.setBeforeBtnClickable(aBoolean);
+            pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 5);
+
             if (aBoolean) {
-                pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 5);
                 ArrayList<Fragment> datas = new ArrayList<>();
                 for (String i : tvDateList) {
                     datas.add(new TvListFragment(beforeList.get(i)));
                 }
                 pagerAdapter.setData(datas, tvDateList);
-                viewPager_before.setAdapter(pagerAdapter);
-                viewPager_before.setOffscreenPageLimit(2);
-                tabLayout_before.setupWithViewPager(viewPager_before);
-                viewPager_before.setPageTransformer(true, new ZoomOutPageTransformer());
-                pagerAdapter.notifyDataSetChanged();
             }else{
                 pagerAdapter.setData(null,null);
-                pagerAdapter.notifyDataSetChanged();
             }
+            viewPager_before.setAdapter(pagerAdapter);
+            viewPager_before.setOffscreenPageLimit(2);
+            tabLayout_before.setupWithViewPager(viewPager_before);
+            viewPager_before.setPageTransformer(true, new ZoomOutPageTransformer());
+            pagerAdapter.notifyDataSetChanged();
         }
     }
 
