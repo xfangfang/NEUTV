@@ -1,6 +1,7 @@
 package com.lalala.fangs.neutv;
 
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,9 +11,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -42,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
     private int loginTime;
+    private BroadcastReceiver broadcastReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textWrong = (TextView) findViewById(R.id.text_wrong);
         btnWrong = (Button) findViewById(R.id.btn_wrong);
+        new getUpdateInfor().execute();
         new getUpdateLive().execute();
 
         SharedPreferences sp = getSharedPreferences("APPCONFIG", Context.MODE_PRIVATE);
         loginTime = sp.getInt("loginTime", 0);
-        if(loginTime < 5){
+        if (loginTime < 3) {
             AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
             ab.setPositiveButton("神奇的功能 点击加群!", new DialogInterface.OnClickListener() {
                 @Override
@@ -110,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ValidFragment")
     public static class AllLiveFragment extends Fragment {
 
-        public AllLiveFragment(){}
+        public AllLiveFragment() {
+        }
 
         private RecyclerView recyclerView;
 
@@ -122,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         private IntentFilter intentFilter;
 
         public AllLiveFragment(String id) {
-            this.liveList = DataSupport.where("itemid = ?",id).find(Live.class);
+            this.liveList = DataSupport.where("itemid = ?", id).find(Live.class);
         }
 
 
@@ -141,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(View view, int position) {
                     Intent intent = new Intent(getContext(), Video.class);
-                    intent.putExtra("live",liveList.get(position));
+                    intent.putExtra("live", liveList.get(position));
                     startActivity(intent);
                 }
 
@@ -154,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
 
-        private void init(View rootView){
+        private void init(View rootView) {
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
 
             localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
@@ -167,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onDestroy() {
             localBroadcastManager.unregisterReceiver(receiver);
-            Log.e(TAG, "onDestroy: 销毁频道列表" );
+            Log.e(TAG, "onDestroy: 销毁频道列表");
             super.onDestroy();
         }
 
@@ -188,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             //更新数据库
             DataSupport.updateAll(Live.class, values, "name = ?", t.getName());
             intent.putExtra("live_name", t.getName());
-            intent.putExtra("live_favorite",t.getIsFavorite());
+            intent.putExtra("live_favorite", t.getIsFavorite());
             localBroadcastManager.sendBroadcast(intent);
             adapter.update(position);
         }
@@ -197,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String name = intent.getStringExtra("live_name");
-                boolean isfavorite = intent.getBooleanExtra("live_favorite",false);
-                if(name != null){
-                    Live temp = DataSupport.where("name = ?",name).findFirst(Live.class);
-                    if(temp != null){
+                boolean isfavorite = intent.getBooleanExtra("live_favorite", false);
+                if (name != null) {
+                    Live temp = DataSupport.where("name = ?", name).findFirst(Live.class);
+                    if (temp != null) {
                         int count = liveList.indexOf(temp);
-                        if(count != -1) {
+                        if (count != -1) {
                             liveList.set(count, temp);
                             adapter.update(count);
                         }
@@ -244,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(View view, int position) {
                     Intent intent = new Intent(getContext(), Video.class);
-                    intent.putExtra("live",liveList.get(position));
+                    intent.putExtra("live", liveList.get(position));
                     startActivity(intent);
                 }
 
@@ -280,22 +289,22 @@ public class MainActivity extends AppCompatActivity {
 
             //发送给分类
             intent.putExtra("live_name", t.getName());
-            intent.putExtra("live_favorite",t.getIsFavorite());
+            intent.putExtra("live_favorite", t.getIsFavorite());
             localBroadcastManager.sendBroadcast(intent);
         }
 
         class FavoriteReceiver extends BroadcastReceiver {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(intent.getBooleanExtra("live_favorite",true)){
+                if (intent.getBooleanExtra("live_favorite", true)) {
                     liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
                     deleteSame();
                     adapter.updateAll(liveList);
-                }else {
+                } else {
                     String name = intent.getStringExtra("live_name");
-                    if(name != null){
-                        Live temp = DataSupport.where("name = ?",name).findFirst(Live.class);
-                        if(temp != null){
+                    if (name != null) {
+                        Live temp = DataSupport.where("name = ?", name).findFirst(Live.class);
+                        if (temp != null) {
                             int position = liveList.indexOf(temp);
                             adapter.remove(position);
                         }
@@ -305,7 +314,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private static final String TAG = "FavoriteLiveFragment";
-        private void deleteSame(){
+
+        private void deleteSame() {
             HashSet<Live> lives = new HashSet<>(liveList);
             liveList = new ArrayList<>(lives);
         }
@@ -320,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
-        public void setData(ArrayList<Fragment> datas,ArrayList<String> titles) {
+        public void setData(ArrayList<Fragment> datas, ArrayList<String> titles) {
             this.datas = datas;
             this.titles = titles;
         }
@@ -358,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
             Request request = new Request
                     .Builder()
                     .url(updateUrl)
-                    .addHeader("user-agent","neutv"+getVersion())
+                    .addHeader("User-Agent", "neutv" + getVersion())
                     .build();
             okhttp3.Response response;
             //每次取节目单前先清除磁盘缓存
@@ -376,8 +386,8 @@ public class MainActivity extends AppCompatActivity {
                 }.getType());
 
                 //储存type信息
-                SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
-                editor.putString("type",typeData.toString());
+                SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
+                editor.putString("type", typeData.toString());
                 editor.apply();
 
             } catch (IOException | JSONException e) {
@@ -408,13 +418,13 @@ public class MainActivity extends AppCompatActivity {
                 titles.add("收藏");
                 datas.add(new FavoriteLiveFragment());
 
-                for(Type i :
-                        typeList){
-                    titles.add(i.getName().substring(0,2));
+                for (Type i :
+                        typeList) {
+                    titles.add(i.getName().substring(0, 2));
                     datas.add(new AllLiveFragment(i.getId()));
                 }
 
-                mSectionsPagerAdapter.setData(datas,titles);
+                mSectionsPagerAdapter.setData(datas, titles);
 
                 mViewPager = (ViewPager) findViewById(R.id.container);
                 mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -437,7 +447,121 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void reCall(View v){
+    private class getUpdateInfor extends AsyncTask<String, Integer, Boolean> {
+
+        String res;
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String updateUrl = "http://hdtv.neu6.edu.cn/soft/neutv.ver";
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request
+                    .Builder()
+                    .url(updateUrl)
+                    .addHeader("User-Agent", "neutv" + getVersion())
+                    .build();
+            okhttp3.Response response;
+            //每次取节目单前先清除磁盘缓存
+            Glide.get(getContext()).clearDiskCache();
+            try {
+                response = client.newCall(request).execute();
+                res = response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (aBoolean) {
+                final String[] items = res.split("\n");
+                try {
+                    double version = Double.valueOf(items[0]);
+                    final String downLoadLink = items[1];
+                    double currentVersion = Double.valueOf(getVersion());
+                    String content = "";
+                    for (int i = 2; i < items.length; i++) {
+                        content += items[i] + "\n";
+                    }
+                    if (version > currentVersion) {
+                        AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
+                        ab.setPositiveButton("更新", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downLoadLink));
+                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                request.setTitle("直视新版本");
+                                request.setDescription(items[0]);
+                                request.addRequestHeader("User-Agent", "neutv" + getVersion());
+                                File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(items[0]) + ".apk");
+                                request.setDestinationUri(Uri.fromFile(saveFile));
+
+                                final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                final long downloadId = manager.enqueue(request);
+                                IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+                                broadcastReceiver = new BroadcastReceiver() {
+                                    @Override
+                                    public void onReceive(Context context, Intent intent) {
+                                        long ID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                                        if (ID == downloadId) {
+                                            DownloadManager.Query query = new DownloadManager.Query();
+                                            query.setFilterById(downloadId);
+                                            query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+                                            Cursor cursor = manager.query(query);
+                                            if (!cursor.moveToFirst()) {
+                                                cursor.close();
+                                                Snackbar.make(progressBar,"下载失败", Snackbar.LENGTH_LONG).show();
+                                                return;
+                                            }
+                                            cursor.close();
+
+                                            Snackbar.make(progressBar,"安装包下载好了", Snackbar.LENGTH_LONG).
+                                                    setDuration(1000000).
+                                                    setAction("安装", new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                                                    File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(items[0]) + ".apk");
+                                                    installIntent.setDataAndType(Uri.fromFile(saveFile),
+                                                            "application/vnd.android.package-archive");
+                                                    installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    startActivity(installIntent);                                                }
+                                            }).show();
+
+                                        }
+                                    }
+                                };
+                                registerReceiver(broadcastReceiver, intentFilter);
+                            }
+                        });
+                        ab.setTitle("新版本 " + String.valueOf(items[0]) + " 来了");
+                        ab.setMessage(content);
+                        AlertDialog dialog = ab.create();
+                        dialog.show();
+                    }
+                } catch (Exception e) {
+                    AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+                    ab.setTitle("消息");
+                    ab.setMessage(res);
+                    AlertDialog dialog = ab.create();
+                    dialog.show();
+                }
+            } else {
+                Log.e(TAG, "onPostExecute: 访问更新信息失败");
+            }
+
+        }
+    }
+
+
+    public void reCall(View v) {
         v.setClickable(false);
         new getUpdateLive().execute();
     }
@@ -448,24 +572,24 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_CENTER:
-                Log.e(TAG, "onKeyDown: ok" );
+                Log.e(TAG, "onKeyDown: ok");
                 break;
 
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                Log.e(TAG, "onKeyDown: down" );
+                Log.e(TAG, "onKeyDown: down");
                 mViewPager.requestFocus();
                 break;
 
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                Log.e(TAG, "onKeyDown: left" );
+                Log.e(TAG, "onKeyDown: left");
                 break;
 
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                Log.e(TAG, "onKeyDown: right" );
+                Log.e(TAG, "onKeyDown: right");
                 break;
 
             case KeyEvent.KEYCODE_DPAD_UP:
-                Log.e(TAG, "onKeyDown: up" );
+                Log.e(TAG, "onKeyDown: up");
                 break;
         }
         return super.onKeyDown(keyCode, event);
@@ -473,6 +597,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 获取版本号
+     *
      * @return 当前应用的版本号
      */
     public String getVersion() {
@@ -506,5 +631,11 @@ public class MainActivity extends AppCompatActivity {
             // 未安装手Q或安装的版本不支持
             return false;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 }
