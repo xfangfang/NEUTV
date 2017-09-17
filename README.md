@@ -2,7 +2,7 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视tv 下载链接 v2.2](app/app-release.apk)
+[直视tv 下载链接 v2.2](https://github.com/xfangfang/NeuTV/releases/download/2.2/app-release.apk)
 
 [东大网关君  酷安商店 链接](https://www.coolapk.com/apk/com.lalala.fangs.neunet)
 
@@ -12,9 +12,9 @@
 
 ### 简介
 
-![shot1](r1.jpg)
+![shot1](http://ac-HSNl7zbI.clouddn.com/7yGm59gEvnVp1vaXaty0jq4inIlAROjx6WAsDRRm.jpg)
 
-![shot2](r2.jpg)
+![shot2](http://ac-HSNl7zbI.clouddn.com/uviVqwwVkkCDwkToCJsxfrWTSQ2jXKgDMbugSiOy.jpg)
 
 
 直视是一款集成电视直播与回看的Android应用，拥有长达七天的直播视频回看期限，在拥有IPV6校园网络的各个地方都能便捷的观看电视节目。
