@@ -394,7 +394,7 @@ public class Video extends AppCompatActivity {
         videoController.contentVisible();
         videoController.ProgressBarVisible();
         video.setVideoURI(uri);
-        video.start();
+        videoController.start();
     }
 
     private class getLiveBefore extends AsyncTask<String, Integer, Boolean> {

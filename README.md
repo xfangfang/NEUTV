@@ -2,7 +2,7 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视tv 下载链接 v2.2](https://github.com/xfangfang/NeuTV/releases/download/2.2/app-release.apk)
+[直视tv 下载链接 v2.2](https://files.cnblogs.com/files/xfangs/neutv2.2.apk)
 
 [东大网关君  酷安商店 链接](https://www.coolapk.com/apk/com.lalala.fangs.neunet)
 
@@ -13,7 +13,6 @@
 ### 简介
 
 ![shot1](http://ac-HSNl7zbI.clouddn.com/7yGm59gEvnVp1vaXaty0jq4inIlAROjx6WAsDRRm.jpg)
-
 ![shot2](http://ac-HSNl7zbI.clouddn.com/uviVqwwVkkCDwkToCJsxfrWTSQ2jXKgDMbugSiOy.jpg)
 
 

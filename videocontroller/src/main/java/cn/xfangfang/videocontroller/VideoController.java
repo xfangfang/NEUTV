@@ -186,9 +186,9 @@ public class VideoController extends RelativeLayout{
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                progressBar.setVisibility(INVISIBLE);
                 long a = videoView.getDuration();
                 reSetAutoGoneTime();
-                progressBar.setVisibility(INVISIBLE);
                 seekBar.setMax((int) a / 1000);
                 txv_end_time.setText(intToString((int) a / 1000));
                 if(stateListener != null){
@@ -219,7 +219,7 @@ public class VideoController extends RelativeLayout{
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 reSetAutoGoneTime();
-                progressBar.setVisibility(INVISIBLE);
+                ProgressBarInvisible();
                 a = seekBar.getProgress();
                 txv_centerTime.setVisibility(VISIBLE);
             }
@@ -227,10 +227,10 @@ public class VideoController extends RelativeLayout{
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 txv_centerTime.setVisibility(INVISIBLE);
-                progressBar.setVisibility(VISIBLE);
-                videoView.pause();
+                ProgressBarVisible();
+                pause();
                 videoView.seekTo(seekBar.getProgress() * 1000);
-                videoView.start();
+                resume();
             }
         });
     }
@@ -378,15 +378,13 @@ public class VideoController extends RelativeLayout{
             public void onClick(View v) {
                 if(videoView != null){
                     if(videoView.isPlaying()){
-                        videoView.pause();
-                        ib_control.setImageResource(R.drawable.ic_action_start);
+                        pause();
                         if(stateListener != null){
                             stateListener.onPause();
                         }
                         reSetAutoGoneTime();
                     }else{
-                        videoView.start();
-                        ib_control.setImageResource(R.drawable.ic_action_pause);
+                        resume();
                         if(stateListener != null){
                             stateListener.onStart();
                         }
@@ -468,6 +466,16 @@ public class VideoController extends RelativeLayout{
                 if (stateListener != null) {
                     stateListener.onStart();
                 }
+                reSetAutoGoneTime();
+            }
+        }
+    }
+
+    public void resume(){
+        if(videoView != null) {
+            if(!videoView.isPlaying()){
+                videoView.start();
+                ib_control.setImageResource(R.drawable.ic_action_pause);
                 reSetAutoGoneTime();
             }
         }
