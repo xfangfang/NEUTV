@@ -2,17 +2,20 @@
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视tv 下载链接 v2.1](https://files.cnblogs.com/files/xfangs/neutv2.1.apk)
+[直视tv 下载链接 v2.2](app/app-release.apk)
 
-[东大网关君 下载链接 v3.1](https://files.cnblogs.com/files/xfangs/kuan3.1.apk)
+[东大网关君  酷安商店 链接](https://www.coolapk.com/apk/com.lalala.fangs.neunet)
 
 [上网呐 app Store 链接](https://itunes.apple.com/cn/app/%E4%B8%8A%E7%BD%91%E5%91%90/id1245043784?mt=8)
 
-直视&网关君交流群：532607431
+直视&网关君交流群：[532607431](https://shang.qq.com/wpa/qunwpa?idkey=1874e330e0db3e5c4e54794b45a2ac69300786ec03f7ddc44bccb8d9bcfd59f6)
 
 ### 简介
 
-![shot](http://ac-HSNl7zbI.clouddn.com/UDPYPPnR6Y8Xzqn6KPQWFAADchqy6jl3XhFjBVDj.jpg)
+![shot1](r1.jpg)
+
+![shot2](r2.jpg)
+
 
 直视是一款集成电视直播与回看的Android应用，拥有长达七天的直播视频回看期限，在拥有IPV6校园网络的各个地方都能便捷的观看电视节目。
 
@@ -46,8 +49,15 @@
 - 增加换源
 - 增加主界面刷新范围，减小卡顿
 - 增加滑动亮度，滑动音量调节
-- 前五次使用应用会显示友善的小提醒
+- 前三次使用应用会显示友善的小提醒
 - 修复回看内容切换后台时，切换回来重新播放的BUG
+
+##### v2.2
+
+- 增加app更新提醒，新版本速度更新
+- 无回看选项的节目不显示回看按钮
+- 修复v2.1版本部分机型无法观看直播的BUG（这个锅应该魅族来背）
+- 优化后台切换体验
 
 ### 致谢
 
