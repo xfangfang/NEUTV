@@ -141,7 +141,7 @@ public class AdapterLive extends RecyclerView.Adapter<AdapterLive.ViewHolder> {
             Glide.with(context)
                     .load("http://hdtv.neu6.edu.cn/wall/img/"+ans+"_s.png?time="+String.valueOf((time-5000)/60000))
                     .placeholder(R.color.cardview_dark_background)
-                    .error(R.color.colorPrimary)
+                    .error(R.color.cardview_dark_background)
                     .into(holder.img);
 //        }
     }

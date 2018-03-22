@@ -72,7 +72,6 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolder> {
     }
 
 
-    private static final String TAG = "AdapterBookList";
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         context = parent.getContext();

@@ -33,8 +33,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -48,6 +50,10 @@ import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView textWrong;
     private Button btnWrong;
+    private ImageView mainImgSetting;
+
+
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
     private int loginTime;
@@ -84,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textWrong = (TextView) findViewById(R.id.text_wrong);
         btnWrong = (Button) findViewById(R.id.btn_wrong);
+        mainImgSetting = (ImageView) findViewById(R.id.main_img_setting);
+
+        initClick();
         new getUpdateInfor().execute();
         new getUpdateLive().execute();
 
@@ -94,12 +106,11 @@ public class MainActivity extends AppCompatActivity {
             ab.setPositiveButton("神奇的功能 点击加群!", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    joinQQGroup("OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA");
+                    utils.joinQQGroup("OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA",MainActivity.this);
                 }
             });
             ab.setTitle("一共只提醒你三次哦");
-            ab.setMessage("\n校园内使用，断开校园网账号，不然流量哗哗的～\n\n" +
-                    "欢迎加群\n532607431\n向作者吐槽");
+            ab.setMessage("欢迎加群\n532607431\n向作者吐槽");
             AlertDialog dialog = ab.create();
             dialog.show();
 
@@ -108,6 +119,17 @@ public class MainActivity extends AppCompatActivity {
         loginTime++;
         spEdit.putInt("loginTime", loginTime);
         spEdit.apply();
+
+    }
+
+    private void initClick(){
+        mainImgSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SettingActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -149,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             adapter.setOnItemClickListener(new AdapterLive.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    Intent intent = new Intent(getContext(), Video.class);
+                    Intent intent = new Intent(getContext(), VideoActivity.class);
                     intent.putExtra("live", liveList.get(position));
                     startActivity(intent);
                 }
@@ -252,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
             adapter.setOnItemClickListener(new AdapterLive.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    Intent intent = new Intent(getContext(), Video.class);
+                    Intent intent = new Intent(getContext(), VideoActivity.class);
                     intent.putExtra("live", liveList.get(position));
                     startActivity(intent);
                 }
@@ -353,8 +375,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //取节目单
     private class getUpdateLive extends AsyncTask<String, Integer, Boolean> {
         private static final String TAG = "getUpdateLive";
+        private boolean netIsV6;
 
         @Override
         protected void onPreExecute() {
@@ -363,11 +387,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
+
+
             String updateUrl = "http://hdtv.neu6.edu.cn/hdtv.json";
+//            String updateUrl = "http://[2001:250:4800:fe:250:56ff:fe92:c016]/xlxy-TVList.json";
+            netIsV6 = isV6("hdtv.neu6.edu.cn");
+
             OkHttpClient client = new OkHttpClient();
             Request request = new Request
                     .Builder()
                     .url(updateUrl)
+                    .addHeader("hdtv",updateUrl)
                     .addHeader("User-Agent", "neutv" + getVersion())
                     .build();
             okhttp3.Response response;
@@ -412,6 +442,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean) {
+                if(netIsV6){
+                    Snackbar.make(progressBar,"IPv6网络", Snackbar.LENGTH_LONG).show();
+                }else{
+                    final Snackbar snackbar4 = Snackbar.make(progressBar,"IPv4网络 可能导致网络计费问题", Snackbar.LENGTH_INDEFINITE);
+                    snackbar4.setAction("我知道", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            snackbar4.dismiss();
+                        }}).show();
+                }
                 mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
                 ArrayList<Fragment> datas = new ArrayList<>();
                 ArrayList<String> titles = new ArrayList<>();
@@ -447,6 +487,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //版本更新
     private class getUpdateInfor extends AsyncTask<String, Integer, Boolean> {
 
         String res;
@@ -465,8 +506,6 @@ public class MainActivity extends AppCompatActivity {
                     .addHeader("User-Agent", "neutv" + getVersion())
                     .build();
             okhttp3.Response response;
-            //每次取节目单前先清除磁盘缓存
-            Glide.get(getContext()).clearDiskCache();
             try {
                 response = client.newCall(request).execute();
                 res = response.body().string();
@@ -522,8 +561,7 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                             cursor.close();
 
-                                            Snackbar.make(progressBar,"安装包下载好了", Snackbar.LENGTH_LONG).
-                                                    setDuration(1000000).
+                                            Snackbar.make(progressBar,"安装包下载好了", Snackbar.LENGTH_INDEFINITE).
                                                     setAction("安装", new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -532,7 +570,8 @@ public class MainActivity extends AppCompatActivity {
                                                     installIntent.setDataAndType(Uri.fromFile(saveFile),
                                                             "application/vnd.android.package-archive");
                                                     installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    startActivity(installIntent);                                                }
+                                                    startActivity(installIntent);
+                                                }
                                             }).show();
 
                                         }
@@ -612,30 +651,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /****************
-     *
-     * 发起添加群流程。群号：直视 官方BUG反馈(532607431) 的 key 为： OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA
-     * 调用 joinQQGroup(OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA) 即可发起手Q客户端申请加群 直视 官方BUG反馈(532607431)
-     *
-     * @param key 由官网生成的key
-     * @return 返回true表示呼起手Q成功，返回fals表示呼起失败
-     ******************/
-    private boolean joinQQGroup(String key) {
-        Intent intent = new Intent();
-        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key));
-        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
-            startActivity(intent);
-            return true;
-        } catch (Exception e) {
-            // 未安装手Q或安装的版本不支持
-            return false;
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
+    }
+
+    public String getDNSIP(String host) {
+        InetAddress x;
+        try {
+            x = InetAddress.getByName(host);
+            return x.getHostAddress();
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public boolean isV6(String host){
+        String reg4 = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$";
+        InetAddress x;
+        try {
+            x = InetAddress.getByName(host);
+            Log.e(TAG, "isV6: host "+x );
+            return !x.getHostAddress().matches(reg4);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

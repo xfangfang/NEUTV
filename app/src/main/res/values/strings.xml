@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">neu tv</string>
     <string name="play">play</string>
+    <string name="source_dialog_title">节目单</string>
 </resources>

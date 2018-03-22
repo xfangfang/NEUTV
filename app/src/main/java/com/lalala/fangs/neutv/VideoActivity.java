@@ -64,12 +64,13 @@ import q.rorbin.verticaltablayout.adapter.TabAdapter;
 import q.rorbin.verticaltablayout.widget.ITabView;
 import q.rorbin.verticaltablayout.widget.TabView;
 
+import static android.icu.text.DateFormat.getDateTimeInstance;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.lalala.fang.neutvshow.R.id.videoView;
 import static org.litepal.LitePalApplication.getContext;
 
-public class Video extends AppCompatActivity {
+public class VideoActivity extends AppCompatActivity {
 
     HashMap<String, ArrayList<ArrayList<String>>> beforeList;
     ArrayList<String> tvDateList;
@@ -179,11 +180,9 @@ public class Video extends AppCompatActivity {
                 if (live.getIsFavorite()) {
                     live.setIsFavorite(false);
                     values.put("isFavorite", "0");
-                    Toast.makeText(getApplicationContext(), "不喜欢了", Toast.LENGTH_LONG).show();
                 } else {
                     live.setIsFavorite(true);
                     values.put("isFavorite", "1");
-                    Toast.makeText(getApplicationContext(), "喜欢", Toast.LENGTH_LONG).show();
                 }
                 videoController.setFavorite(live.getIsFavorite());
                 //更新数据库
@@ -198,11 +197,10 @@ public class Video extends AppCompatActivity {
             public void onError() {
                 urlIndex++;
                 if(urlIndex < urlList.size()) {
-                    Toast.makeText(getApplicationContext(), "当当前资源不可用 正在自动切换直播源", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "当前资源不可用 正在自动切换直播源", Toast.LENGTH_LONG).show();
                     playTv(urlList.get(urlIndex));
                 }else{
                     Toast.makeText(getApplicationContext(), "资源出了点问题", Toast.LENGTH_LONG).show();
-//                    finish();
                 }
             }
 
@@ -304,11 +302,6 @@ public class Video extends AppCompatActivity {
     }
 
 
-    private List<String> getDiffRes(String url) {
-        String[] n = url.split("#");
-        return Arrays.asList(n);
-    }
-
     private String getName(String url) {
         String short_url = url.substring(26, url.length()-5);
         String[] temp = short_url.split("/");
@@ -386,7 +379,7 @@ public class Video extends AppCompatActivity {
         super.onConfigurationChanged(config);
     }
 
-    private static final String TAG = "Video";
+    private static final String TAG = "VideoActivity";
 
     public void playTv(String url) {
         updateResPos();
@@ -457,6 +450,9 @@ public class Video extends AppCompatActivity {
         }
     }
 
+    /**
+     * 回看
+     */
     @SuppressLint("ValidFragment")
     public static class TvListFragment extends Fragment {
 
@@ -467,7 +463,7 @@ public class Video extends AppCompatActivity {
         private RecyclerView recyclerView;
         private AdapterList adapter;
         private ArrayList<ArrayList<String>> beforeList;
-        private Video parentActivity;
+        private VideoActivity parentActivity;
 
         @Override
         public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -479,7 +475,7 @@ public class Video extends AppCompatActivity {
             StaggeredGridLayoutManager sm = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(sm);
             recyclerView.setAdapter(adapter);
-            parentActivity = (Video) getActivity();
+            parentActivity = (VideoActivity) getActivity();
             adapter.setOnItemClickListener(new AdapterList.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
@@ -514,6 +510,9 @@ public class Video extends AppCompatActivity {
 
     }
 
+    /**
+     * 换台
+     */
     @SuppressLint("ValidFragment")
     public static class TvShowFragment extends Fragment {
 
@@ -847,7 +846,6 @@ public class Video extends AppCompatActivity {
 
     private void showSettingLayout(){
         layoutSetting.setVisibility(View.VISIBLE);
-
 //        Animator.AnimatorListener listener = null;
 //        listener = new Animator.AnimatorListener() {
 //            @Override

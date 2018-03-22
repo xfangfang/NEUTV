@@ -39,6 +39,20 @@
                     android:layout_margin="4dp"
                     android:src="@mipmap/zhi" />
 
+                <ImageView
+                    android:id="@+id/main_img_setting"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_action_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:id="@+id/main_img_search"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_action_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
             </android.support.v7.widget.Toolbar>
 
             <View
