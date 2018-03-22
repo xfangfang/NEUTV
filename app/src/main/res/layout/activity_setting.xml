@@ -32,6 +32,7 @@
                 android:background="#EEEEEE"/>
 
             <RelativeLayout
+                android:id="@+id/setting_activity_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -58,9 +59,8 @@
                         android:layout_marginLeft="32dp"
                         android:text="你的观影记录"/>
                 </LinearLayout>
-
-
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/setting_activity_choose_list"
                 android:layout_width="match_parent"
@@ -103,6 +103,7 @@
                 android:background="#EEEEEE"/>
 
             <RelativeLayout
+                android:id="@+id/setting_activity_qq_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -133,6 +134,7 @@
 
             </RelativeLayout>
             <RelativeLayout
+                android:id="@+id/setting_activity_github"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -148,7 +150,7 @@
                         android:layout_marginBottom="4dp"
                         android:layout_marginLeft="32dp"
                         android:layout_marginTop="16dp"
-                        android:text="直视在github"
+                        android:text="直视 在github"
                         android:textColor="#A0000000"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -163,6 +165,7 @@
 
             </RelativeLayout>
             <RelativeLayout
+                android:id="@+id/setting_activity_update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -203,6 +206,7 @@
                 android:background="#EEEEEE"/>
 
             <RelativeLayout
+                android:id="@+id/setting_activity_third_party"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"

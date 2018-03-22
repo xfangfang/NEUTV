@@ -2,7 +2,13 @@ package com.lalala.fangs.neutv;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.util.Log;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by fang on 2018/3/22.
@@ -27,6 +33,46 @@ public class utils {
         } catch (Exception e) {
             // 未安装手Q或安装的版本不支持
             return false;
+        }
+    }
+
+    public static String getDNSIP(String host) {
+        InetAddress x;
+        try {
+            x = InetAddress.getByName(host);
+            return x.getHostAddress();
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static boolean isV6(String host){
+        String reg4 = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$";
+        InetAddress x;
+        try {
+            x = InetAddress.getByName(host);
+            return !x.getHostAddress().matches(reg4);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 获取版本号
+     *
+     * @return 当前应用的版本号
+     */
+    public static String getVersion(Context context) {
+        try {
+            PackageManager manager = context.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "null";
         }
     }
 }

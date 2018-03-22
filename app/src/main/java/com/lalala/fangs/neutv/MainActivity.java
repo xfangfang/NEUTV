@@ -132,249 +132,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-    }
-
-    @SuppressLint("ValidFragment")
-    public static class AllLiveFragment extends Fragment {
-
-        public AllLiveFragment() {
-        }
-
-        private RecyclerView recyclerView;
-
-        private List<Live> liveList;
-
-        private AdapterLive adapter;
-        private LocalBroadcastManager localBroadcastManager;
-        private FavoriteReceiver receiver;
-        private IntentFilter intentFilter;
-
-        public AllLiveFragment(String id) {
-            this.liveList = DataSupport.where("itemid = ?", id).find(Live.class);
-        }
-
-
-        @Override
-        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-
-            View rootView = inflater.inflate(R.layout.fragment_all, container, false);
-            init(rootView);
-
-            adapter = new AdapterLive(liveList);
-            StaggeredGridLayoutManager sm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-            recyclerView.setLayoutManager(sm);
-            recyclerView.setAdapter(adapter);
-            adapter.setOnItemClickListener(new AdapterLive.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    Intent intent = new Intent(getContext(), VideoActivity.class);
-                    intent.putExtra("live", liveList.get(position));
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onItemLongClick(View view, int position) {
-                    addToFavorite(position);
-                }
-            });
-
-            return rootView;
-        }
-
-        private void init(View rootView) {
-            recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-
-            localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
-            intentFilter = new IntentFilter();
-            intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
-            receiver = new FavoriteReceiver();
-            localBroadcastManager.registerReceiver(receiver, intentFilter);
-        }
-
-        @Override
-        public void onDestroy() {
-            localBroadcastManager.unregisterReceiver(receiver);
-            Log.e(TAG, "onDestroy: 销毁频道列表");
-            super.onDestroy();
-        }
-
-        private static final String TAG = "FindBooksFragment";
-
-        private void addToFavorite(int position) {
-            Live t = liveList.get(position);
-            ContentValues values = new ContentValues();
-            Intent intent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
-
-            if (t.getIsFavorite()) {
-                t.setIsFavorite(false);
-                values.put("isFavorite", "0");
-            } else {
-                t.setIsFavorite(true);
-                values.put("isFavorite", "1");
-            }
-            //更新数据库
-            DataSupport.updateAll(Live.class, values, "name = ?", t.getName());
-            intent.putExtra("live_name", t.getName());
-            intent.putExtra("live_favorite", t.getIsFavorite());
-            localBroadcastManager.sendBroadcast(intent);
-            adapter.update(position);
-        }
-
-        class FavoriteReceiver extends BroadcastReceiver {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String name = intent.getStringExtra("live_name");
-                boolean isfavorite = intent.getBooleanExtra("live_favorite", false);
-                if (name != null) {
-                    Live temp = DataSupport.where("name = ?", name).findFirst(Live.class);
-                    if (temp != null) {
-                        int count = liveList.indexOf(temp);
-                        if (count != -1) {
-                            liveList.set(count, temp);
-                            adapter.update(count);
-                        }
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    @SuppressLint("ValidFragment")
-    public static class FavoriteLiveFragment extends Fragment {
-
-        public FavoriteLiveFragment() {
-        }
-
-        private RecyclerView recyclerView;
-        private List<Live> liveList = new ArrayList<>();
-        private AdapterLive adapter;
-        private LocalBroadcastManager localBroadcastManager;
-        private FavoriteReceiver receiver;
-        private IntentFilter intentFilter;
-
-
-        @Override
-        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-
-            View rootView = inflater.inflate(R.layout.fragment_all, container, false);
-            recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-            liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
-            deleteSame();
-            adapter = new AdapterLive(liveList);
-            StaggeredGridLayoutManager sm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-            recyclerView.setLayoutManager(sm);
-            recyclerView.setAdapter(adapter);
-            adapter.setOnItemClickListener(new AdapterLive.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    Intent intent = new Intent(getContext(), VideoActivity.class);
-                    intent.putExtra("live", liveList.get(position));
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onItemLongClick(View view, int position) {
-                    addToFavorite(position);
-                }
-            });
-            localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
-            intentFilter = new IntentFilter();
-            intentFilter.addAction("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
-            receiver = new FavoriteReceiver();
-            localBroadcastManager.registerReceiver(receiver, intentFilter);
-            return rootView;
-        }
-
-        private void addToFavorite(int position) {
-            Live t = liveList.get(position);
-            ContentValues values = new ContentValues();
-            Intent intent = new Intent("com.lalala.fangs.neutv.LIVE_FAVORITE_CHANGE");
-
-            if (t.getIsFavorite()) {
-                t.setIsFavorite(false);
-                values.put("isFavorite", "0");
-            } else {
-                //对于收藏夹，这个程序块不会被运行
-                t.setIsFavorite(true);
-                values.put("isFavorite", "1");
-                adapter.update(position);
-            }
-            //更新数据库
-            DataSupport.updateAll(Live.class, values, "name = ?", t.getName());
-
-            //发送给分类
-            intent.putExtra("live_name", t.getName());
-            intent.putExtra("live_favorite", t.getIsFavorite());
-            localBroadcastManager.sendBroadcast(intent);
-        }
-
-        class FavoriteReceiver extends BroadcastReceiver {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getBooleanExtra("live_favorite", true)) {
-                    liveList = DataSupport.where("isFavorite = ?", "1").find(Live.class);
-                    deleteSame();
-                    adapter.updateAll(liveList);
-                } else {
-                    String name = intent.getStringExtra("live_name");
-                    if (name != null) {
-                        Live temp = DataSupport.where("name = ?", name).findFirst(Live.class);
-                        if (temp != null) {
-                            int position = liveList.indexOf(temp);
-                            adapter.remove(position);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static final String TAG = "FavoriteLiveFragment";
-
-        private void deleteSame() {
-            HashSet<Live> lives = new HashSet<>(liveList);
-            liveList = new ArrayList<>(lives);
-        }
-
-    }
-
-    private class SectionsPagerAdapter extends FragmentPagerAdapter {
-        private ArrayList<Fragment> datas;
-        private ArrayList<String> titles;
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        public void setData(ArrayList<Fragment> datas, ArrayList<String> titles) {
-            this.datas = datas;
-            this.titles = titles;
-        }
-
-
-        @Override
-        public Fragment getItem(int position) {
-            return datas == null ? null : datas.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return datas == null ? 0 : datas.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return titles.get(position);
-        }
-
-    }
-
     //取节目单
     private class getUpdateLive extends AsyncTask<String, Integer, Boolean> {
         private static final String TAG = "getUpdateLive";
@@ -391,14 +148,14 @@ public class MainActivity extends AppCompatActivity {
 
             String updateUrl = "http://hdtv.neu6.edu.cn/hdtv.json";
 //            String updateUrl = "http://[2001:250:4800:fe:250:56ff:fe92:c016]/xlxy-TVList.json";
-            netIsV6 = isV6("hdtv.neu6.edu.cn");
+            netIsV6 = utils.isV6("hdtv.neu6.edu.cn");
 
             OkHttpClient client = new OkHttpClient();
             Request request = new Request
                     .Builder()
                     .url(updateUrl)
                     .addHeader("hdtv",updateUrl)
-                    .addHeader("User-Agent", "neutv" + getVersion())
+                    .addHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this))
                     .build();
             okhttp3.Response response;
             //每次取节目单前先清除磁盘缓存
@@ -503,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
             Request request = new Request
                     .Builder()
                     .url(updateUrl)
-                    .addHeader("User-Agent", "neutv" + getVersion())
+                    .addHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this))
                     .build();
             okhttp3.Response response;
             try {
@@ -524,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     double version = Double.valueOf(items[0]);
                     final String downLoadLink = items[1];
-                    double currentVersion = Double.valueOf(getVersion());
+                    double currentVersion = Double.valueOf(utils.getVersion(MainActivity.this));
                     String content = "";
                     for (int i = 2; i < items.length; i++) {
                         content += items[i] + "\n";
@@ -538,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                 request.setTitle("直视新版本");
                                 request.setDescription(items[0]);
-                                request.addRequestHeader("User-Agent", "neutv" + getVersion());
+                                request.addRequestHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this));
                                 File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(items[0]) + ".apk");
                                 request.setDestinationUri(Uri.fromFile(saveFile));
 
@@ -600,6 +357,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * 访问网络失败 重新访问
+     * @param v
+     */
     public void reCall(View v) {
         v.setClickable(false);
         new getUpdateLive().execute();
@@ -634,52 +395,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    /**
-     * 获取版本号
-     *
-     * @return 当前应用的版本号
-     */
-    public String getVersion() {
-        try {
-            PackageManager manager = this.getPackageManager();
-            PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
-            return info.versionName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "null";
-        }
-    }
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
     }
 
-    public String getDNSIP(String host) {
-        InetAddress x;
-        try {
-            x = InetAddress.getByName(host);
-            return x.getHostAddress();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return "";
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
     }
 
-    public boolean isV6(String host){
-        String reg4 = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$";
-        InetAddress x;
-        try {
-            x = InetAddress.getByName(host);
-            Log.e(TAG, "isV6: host "+x );
-            return !x.getHostAddress().matches(reg4);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+
 }
