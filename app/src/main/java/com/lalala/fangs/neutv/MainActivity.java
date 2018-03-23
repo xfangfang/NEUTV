@@ -73,19 +73,36 @@ public class MainActivity extends AppCompatActivity {
     private TextView textWrong;
     private Button btnWrong;
     private ImageView mainImgSetting;
+    private ImageView mainImgSearch;
 
 
     private List<Live> liveList = new ArrayList<>();
     private List<Type> typeList = new ArrayList<>();
     private int loginTime;
     private BroadcastReceiver broadcastReceiver;
+    private DataSaver dataSaver;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+        initClick();
+        new getUpdateInfor().execute();
+        new getUpdateLive().execute();
+        dataSaver = new DataSaver(MainActivity.this);
 
+
+        loginTime = dataSaver.getLoginTime();
+        if (loginTime < 3) {
+            showQQDialog();
+        }
+        dataSaver.incLoginTime();
+
+    }
+
+    private void initView(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -94,32 +111,7 @@ public class MainActivity extends AppCompatActivity {
         textWrong = (TextView) findViewById(R.id.text_wrong);
         btnWrong = (Button) findViewById(R.id.btn_wrong);
         mainImgSetting = (ImageView) findViewById(R.id.main_img_setting);
-
-        initClick();
-        new getUpdateInfor().execute();
-        new getUpdateLive().execute();
-
-        SharedPreferences sp = getSharedPreferences("APPCONFIG", Context.MODE_PRIVATE);
-        loginTime = sp.getInt("loginTime", 0);
-        if (loginTime < 3) {
-            AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
-            ab.setPositiveButton("神奇的功能 点击加群!", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    utils.joinQQGroup("OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA",MainActivity.this);
-                }
-            });
-            ab.setTitle("一共只提醒你三次哦");
-            ab.setMessage("欢迎加群\n532607431\n向作者吐槽");
-            AlertDialog dialog = ab.create();
-            dialog.show();
-
-        }
-        SharedPreferences.Editor spEdit = getSharedPreferences("APPCONFIG", Context.MODE_PRIVATE).edit();
-        loginTime++;
-        spEdit.putInt("loginTime", loginTime);
-        spEdit.apply();
-
+        mainImgSearch = (ImageView) findViewById(R.id.main_img_search);
     }
 
     private void initClick(){
@@ -130,6 +122,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        mainImgSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    private void showQQDialog(){
+        AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
+        ab.setPositiveButton("神奇的功能 点击加群!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                utils.joinQQGroup("OVbiu9aw_bqHtOgXM_fb17lOW0LpzKeA",MainActivity.this);
+            }
+        });
+        ab.setTitle("一共只提醒你三次哦");
+        ab.setMessage("欢迎加群\n532607431\n认识作者小哥哥");
+        AlertDialog dialog = ab.create();
+        dialog.show();
     }
 
     //取节目单
@@ -144,11 +156,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-
-
             String updateUrl = "http://hdtv.neu6.edu.cn/hdtv.json";
 //            String updateUrl = "http://[2001:250:4800:fe:250:56ff:fe92:c016]/xlxy-TVList.json";
-            netIsV6 = utils.isV6("hdtv.neu6.edu.cn");
+            netIsV6 = utils.isV6(updateUrl);
+            Log.e(TAG, "doInBackground: "+netIsV6 );
 
             OkHttpClient client = new OkHttpClient();
             Request request = new Request

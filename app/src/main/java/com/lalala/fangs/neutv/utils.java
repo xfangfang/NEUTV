@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
 /**
@@ -48,15 +49,23 @@ public class utils {
         return "";
     }
 
-    public static boolean isV6(String host){
+    public static boolean isV6(String url){
         String reg4 = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$";
         InetAddress x;
+        String host;
+
         try {
-            x = InetAddress.getByName(host);
-            return !x.getHostAddress().matches(reg4);
-        } catch (UnknownHostException e) {
+            host = new java.net.URL(url).getHost();
+            try {
+                x = InetAddress.getByName(host);
+                return !x.getHostAddress().matches(reg4);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
