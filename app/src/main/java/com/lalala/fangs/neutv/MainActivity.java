@@ -87,9 +87,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        utils.getVersion(MainActivity.this);
         initView();
         initClick();
-        new getUpdateInfor().execute();
+        System.out.println(utils.APP_VERSION);
+        checkUpdate();
         new getUpdateLive().execute();
         dataSaver = new DataSaver(MainActivity.this);
 
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     .Builder()
                     .url(updateUrl)
                     .addHeader("hdtv",updateUrl)
-                    .addHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this))
+                    .addHeader("User-Agent", "neutv" + utils.APP_VERSION)
                     .build();
             okhttp3.Response response;
             //每次取节目单前先清除磁盘缓存
@@ -255,118 +257,89 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //版本更新
-    private class getUpdateInfor extends AsyncTask<String, Integer, Boolean> {
+    /**
+     * 检查软件版本状态
+     */
+    private void checkUpdate(){
+        UpdataAPK.onUpdate(new UpdataAPK.UpdateListener() {
+            /**
+             * 每次获取更新信息时响应
+             * @param version 当前的最新版本
+             * @param description 最新版本的说明
+             * @param downloadLink 最新版本的下载链接
+             */
+            @Override
+            public void info(final double version, String description, final String downloadLink) {
+                if (version > Double.valueOf(utils.APP_VERSION)) {
+                    AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
+                    ab.setPositiveButton("更新", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadLink));
+                            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                            request.setTitle("直视新版本");
+                            request.setDescription(String.valueOf(version));
+                            request.addRequestHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this));
+                            File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(version) + ".apk");
+                            request.setDestinationUri(Uri.fromFile(saveFile));
 
-        String res;
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String updateUrl = "http://hdtv.neu6.edu.cn/soft/neutv.ver";
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request
-                    .Builder()
-                    .url(updateUrl)
-                    .addHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this))
-                    .build();
-            okhttp3.Response response;
-            try {
-                response = client.newCall(request).execute();
-                res = response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean) {
-                final String[] items = res.split("\n");
-                try {
-                    double version = Double.valueOf(items[0]);
-                    final String downLoadLink = items[1];
-                    double currentVersion = Double.valueOf(utils.getVersion(MainActivity.this));
-                    String content = "";
-                    for (int i = 2; i < items.length; i++) {
-                        content += items[i] + "\n";
-                    }
-                    if (version > currentVersion) {
-                        AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);  //(普通消息框)
-                        ab.setPositiveButton("更新", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downLoadLink));
-                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                request.setTitle("直视新版本");
-                                request.setDescription(items[0]);
-                                request.addRequestHeader("User-Agent", "neutv" + utils.getVersion(MainActivity.this));
-                                File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(items[0]) + ".apk");
-                                request.setDestinationUri(Uri.fromFile(saveFile));
-
-                                final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                final long downloadId = manager.enqueue(request);
-                                IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-                                broadcastReceiver = new BroadcastReceiver() {
-                                    @Override
-                                    public void onReceive(Context context, Intent intent) {
-                                        long ID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                                        if (ID == downloadId) {
-                                            DownloadManager.Query query = new DownloadManager.Query();
-                                            query.setFilterById(downloadId);
-                                            query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
-                                            Cursor cursor = manager.query(query);
-                                            if (!cursor.moveToFirst()) {
-                                                cursor.close();
-                                                Snackbar.make(progressBar,"下载失败", Snackbar.LENGTH_LONG).show();
-                                                return;
-                                            }
+                            final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                            final long downloadId = manager.enqueue(request);
+                            IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+                            broadcastReceiver = new BroadcastReceiver() {
+                                @Override
+                                public void onReceive(Context context, Intent intent) {
+                                    long ID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                                    if (ID == downloadId) {
+                                        DownloadManager.Query query = new DownloadManager.Query();
+                                        query.setFilterById(downloadId);
+                                        query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+                                        Cursor cursor = manager.query(query);
+                                        if (!cursor.moveToFirst()) {
                                             cursor.close();
-
-                                            Snackbar.make(progressBar,"安装包下载好了", Snackbar.LENGTH_INDEFINITE).
-                                                    setAction("安装", new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                                                    File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(items[0]) + ".apk");
-                                                    installIntent.setDataAndType(Uri.fromFile(saveFile),
-                                                            "application/vnd.android.package-archive");
-                                                    installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    startActivity(installIntent);
-                                                }
-                                            }).show();
-
+                                            Snackbar.make(progressBar, "下载失败", Snackbar.LENGTH_LONG).show();
+                                            return;
                                         }
+                                        cursor.close();
+                                        Snackbar.make(progressBar, "安装包下载好了", Snackbar.LENGTH_INDEFINITE).
+                                                setAction("安装", new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                                                        File saveFile = new File(Environment.getExternalStorageDirectory(), "neutv" + String.valueOf(version) + ".apk");
+                                                        installIntent.setDataAndType(Uri.fromFile(saveFile),
+                                                                "application/vnd.android.package-archive");
+                                                        installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                        startActivity(installIntent);
+                                                    }
+                                                }).show();
                                     }
-                                };
-                                registerReceiver(broadcastReceiver, intentFilter);
-                            }
-                        });
-                        ab.setTitle("新版本 " + String.valueOf(items[0]) + " 来了");
-                        ab.setMessage(content);
-                        AlertDialog dialog = ab.create();
-                        dialog.show();
-                    }
-                } catch (Exception e) {
-                    AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
-                    ab.setTitle("消息");
-                    ab.setMessage(res);
+                                }
+                            };
+                            registerReceiver(broadcastReceiver, intentFilter);
+                        }
+                    });
+                    ab.setTitle("新版本 " + String.valueOf(version) + " 来了");
+                    ab.setMessage(description);
                     AlertDialog dialog = ab.create();
                     dialog.show();
                 }
-            } else {
-                Log.e(TAG, "onPostExecute: 访问更新信息失败");
             }
 
-        }
+            /**
+             * 当获取到无法解析的更新信息时响应
+             * @param errorInfo 错误信息
+             */
+            @Override
+            public void error(String errorInfo) {
+                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+                ab.setTitle("错误消息");
+                ab.setMessage(errorInfo);
+                AlertDialog dialog = ab.create();
+                dialog.show();
+            }
+        });
     }
-
 
     /**
      * 访问网络失败 重新访问
@@ -409,7 +382,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(broadcastReceiver);
+        if(broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
     }
 
     @Override

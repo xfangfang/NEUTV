@@ -69,6 +69,7 @@ public class utils {
         return false;
     }
 
+    static String APP_VERSION;
     /**
      * 获取版本号
      *
@@ -78,10 +79,12 @@ public class utils {
         try {
             PackageManager manager = context.getPackageManager();
             PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            APP_VERSION = info.versionName;
             return info.versionName;
         } catch (Exception e) {
             e.printStackTrace();
             return "null";
         }
     }
+
 }
