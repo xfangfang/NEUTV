@@ -1,14 +1,9 @@
-# NeuTv
+# NEU TV
 
 使用校园网便捷的观看网络电视 Android 移动版
 
-[直视tv 下载链接 v2.2](https://files.cnblogs.com/files/xfangs/neutv2.2.apk)
+[直视tv 下载链接 v2.2](https://github.com/xfangfang/NeuTV/releases/download/2.2/app-release.apk)
 
-[东大网关君  酷安商店 链接](https://www.coolapk.com/apk/com.lalala.fangs.neunet)
-
-[上网呐 app Store 链接](https://itunes.apple.com/cn/app/%E4%B8%8A%E7%BD%91%E5%91%90/id1245043784?mt=8)
-
-直视&网关君交流群：[532607431](https://shang.qq.com/wpa/qunwpa?idkey=1874e330e0db3e5c4e54794b45a2ac69300786ec03f7ddc44bccb8d9bcfd59f6)
 
 ### 简介
 
@@ -29,7 +24,31 @@
 - 更多功能，敬请期待
 
 
-### 主要版本说明
+
+### 合作者
+
+[xfangfang](https://github.com/xfangfang)
+
+[timberswift](https://github.com/timberswift)
+
+[tianzhipengfei](https://github.com/tianzhipengfei)
+
+北影 老头子
+
+### 相关APP与交流群
+[东大网关君  酷安商店 链接](https://www.coolapk.com/apk/com.lalala.fangs.neunet)
+
+[上网呐 app Store 链接](https://itunes.apple.com/cn/app/%E4%B8%8A%E7%BD%91%E5%91%90/id1245043784?mt=8)
+
+直视&网关君交流群：[532607431](https://shang.qq.com/wpa/qunwpa?idkey=1874e330e0db3e5c4e54794b45a2ac69300786ec03f7ddc44bccb8d9bcfd59f6)
+
+### 致谢
+
+感谢节目源的诸多提供者，以及帮助激励我的老师。
+谢谢～
+
+
+### 版本更新说明
 
 ##### V1.0
 
@@ -58,17 +77,4 @@
 - 修复v2.1版本部分机型无法观看直播的BUG（这个锅应该魅族来背）
 - 优化后台切换体验
 
-### 致谢
 
-感谢节目源的诸多提供者，以及帮助激励我的老师。
-谢谢～
-
-### 合作者
-
-[xfangfang](https://github.com/xfangfang)
-
-[timberswift](https://github.com/timberswift)
-
-[tianzhipengfei](https://github.com/tianzhipengfei)
-
-北影 老头子
